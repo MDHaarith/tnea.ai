@@ -13,6 +13,18 @@ else:
 class Config:
     """Central configuration for TNEA AI."""
     
+    try:
+        import streamlit as st
+        # Try loading from secrets if available
+        if "NVIDIA_API_KEY" in st.secrets:
+            os.environ["NVIDIA_API_KEY"] = st.secrets["NVIDIA_API_KEY"]
+        if "NVIDIA_API_BASE" in st.secrets:
+            os.environ["NVIDIA_API_BASE"] = st.secrets["NVIDIA_API_BASE"]
+    except ImportError:
+        pass
+    except FileNotFoundError:
+        pass # Secrets not found
+
     # API Configuration
     NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
     NVIDIA_API_BASE = os.getenv("NVIDIA_API_BASE", "https://integrate.api.nvidia.com/v1")
