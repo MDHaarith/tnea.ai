@@ -65,7 +65,7 @@ class ResponseFormatter:
                         output.append(f"| {row_num} | **{name}** | {branch} | {cutoff} | {seats_str} | {placement} | {location} |")
                         row_num += 1
                     else:
-                        output.append(f"| ↳ | | {branch} | {cutoff} | {seats_str} | {placement} | {location} |")
+                        output.append(f"|  | | {branch} | {cutoff} | {seats_str} | {placement} | {location} |")
             
             if remaining > 0:
                 output.append(f"*+{remaining} more colleges available.*")

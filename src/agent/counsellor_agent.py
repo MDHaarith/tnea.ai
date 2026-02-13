@@ -284,7 +284,7 @@ Be comprehensive and detailed. This table will be used by the student for actual
             self.memory.add_message("assistant", full_response)
             
             # 6. Disclaimer
-            yield "\n\n---\n⚠️ **Disclaimer**: The cutoff marks and college data in the tables above are from our verified TNEA database. However, **placement percentages, salary figures, strategic advice, and predictions are AI-generated and may not be 100% accurate**. Always verify placement records on official college websites or by contacting the institution directly before making decisions.\n---\n"
+            yield "\n\n---\n⚠️ **Note**: Cutoff data is from official TNEA records. Placement stats and predictions are AI estimates. Please verify details with colleges directly.\n---\n"
 
     # Branch alias mapping
     BRANCH_ALIASES = {
@@ -315,6 +315,8 @@ Be comprehensive and detailed. This table will be used by the student for actual
         "IOT": ["INTERNET OF THINGS"],
         "MECHATRONICS": ["MECHATRONICS"],
         "CORE": ["ELECTRONICS AND COMMUNICATION", "ELECTRICAL AND ELECTRONICS", "MECHANICAL ENGINEERING", "CIVIL ENGINEERING"],
+        "CS GROUP": ["COMPUTER SCIENCE", "INFORMATION TECHNOLOGY", "ARTIFICIAL INTELLIGENCE", "CYBER", "DATA SCIENCE", "COMPUTING", "MACHINE LEARNING", "IOT"],
+        "CS": ["COMPUTER SCIENCE", "INFORMATION TECHNOLOGY", "ARTIFICIAL INTELLIGENCE", "CYBER", "DATA SCIENCE", "COMPUTING", "MACHINE LEARNING", "IOT"],
     }
 
     def _enrich_with_cutoffs(self, colleges: list, community: str = "OC") -> list:

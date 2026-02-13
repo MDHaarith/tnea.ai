@@ -12,7 +12,7 @@ KNOWN_BRANCHES = [
     "CSE", "ECE", "MECH", "CIVIL", "EEE", "IT", "AI", "AIDS", "AIML",
     "BME", "CHEM", "AUTO", "AERO", "BIOTECH", "CSBS", "CSD", "FOOD",
     "AGRI", "MARINE", "MINING", "TEXTILE", "PRINTING", "ROBOTICS",
-    "CYBER", "IOT", "MECHATRONICS", "CORE"
+    "CYBER", "IOT", "MECHATRONICS", "CORE", "CS GROUP", "CS"
 ]
 
 # Tamil Nadu districts for location extraction
@@ -125,7 +125,7 @@ class IntentRouter:
                 break
         # Also check full names
         branch_fullnames = {
-            "computer science": "CSE", "electronics": "ECE", "mechanical": "MECH",
+            "computer science": "CS", "electronics": "ECE", "mechanical": "MECH",
             "civil": "CIVIL", "electrical": "EEE", "information technology": "IT",
             "artificial intelligence": "AI", "data science": "AIDS",
             "biotechnology": "BIOTECH", "biomedical": "BME",

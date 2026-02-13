@@ -37,7 +37,7 @@ case $MODE in
     "gui"|"streamlit"|"web")
         echo "🚀 Launching Enhanced Streamlit UI..."
         cd src
-        streamlit run enhanced_streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+        streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0
         ;;
     "cli"|"terminal")
         echo "🚀 Launching Enhanced CLI Mode..."
@@ -47,7 +47,7 @@ case $MODE in
     "enhanced-gui")
         echo "🚀 Launching Enhanced Streamlit UI..."
         cd src
-        streamlit run enhanced_streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+        streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0
         ;;
     "help"|"-h"|"--help")
         echo "Usage: $0 [mode]"
