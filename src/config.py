@@ -16,25 +16,31 @@ class Config:
     try:
         import streamlit as st
         # Helper to get secrets from potentially nested TOML
-        def _get_secret(key, section=None):
-            if section and section in st.secrets and key in st.secrets[section]:
-                return st.secrets[section][key]
-            if key in st.secrets:
-                return st.secrets[key]
-            return None
-
-        # Load critical secrets into environment variables
-        api_key = _get_secret("NVIDIA_API_KEY", "nvidia")
-        if api_key: os.environ["NVIDIA_API_KEY"] = api_key
+        # Inlined logic to avoid class scope issues
         
-        api_base = _get_secret("NVIDIA_API_BASE", "nvidia")
-        if api_base: os.environ["NVIDIA_API_BASE"] = api_base
-        
-        model_name = _get_secret("MODEL_NAME", "nvidia")
-        if model_name: os.environ["MODEL_NAME"] = model_name
+        # NVIDIA_API_KEY
+        if "nvidia" in st.secrets and "NVIDIA_API_KEY" in st.secrets["nvidia"]:
+            os.environ["NVIDIA_API_KEY"] = st.secrets["nvidia"]["NVIDIA_API_KEY"]
+        elif "NVIDIA_API_KEY" in st.secrets:
+            os.environ["NVIDIA_API_KEY"] = st.secrets["NVIDIA_API_KEY"]
+            
+        # NVIDIA_API_BASE
+        if "nvidia" in st.secrets and "NVIDIA_API_BASE" in st.secrets["nvidia"]:
+             os.environ["NVIDIA_API_BASE"] = st.secrets["nvidia"]["NVIDIA_API_BASE"]
+        elif "NVIDIA_API_BASE" in st.secrets:
+             os.environ["NVIDIA_API_BASE"] = st.secrets["NVIDIA_API_BASE"]
+             
+        # MODEL_NAME
+        if "nvidia" in st.secrets and "MODEL_NAME" in st.secrets["nvidia"]:
+             os.environ["MODEL_NAME"] = st.secrets["nvidia"]["MODEL_NAME"]
+        elif "MODEL_NAME" in st.secrets:
+             os.environ["MODEL_NAME"] = st.secrets["MODEL_NAME"]
 
-        debug_val = _get_secret("DEBUG", "app")
-        if debug_val is not None: os.environ["DEBUG"] = str(debug_val)
+        # DEBUG
+        if "app" in st.secrets and "DEBUG" in st.secrets["app"]:
+             os.environ["DEBUG"] = str(st.secrets["app"]["DEBUG"])
+        elif "DEBUG" in st.secrets:
+             os.environ["DEBUG"] = str(st.secrets["DEBUG"])
 
     except ImportError:
         pass
