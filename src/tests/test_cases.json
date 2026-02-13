@@ -1,0 +1,226 @@
+[
+    {
+        "id": "intent_off_topic_weather",
+        "input": "What is the weather today?",
+        "expected_intent": "OFF_TOPIC",
+        "type": "intent"
+    },
+    {
+        "id": "intent_off_topic_movie",
+        "input": "Tell me a joke about movies",
+        "expected_intent": "OFF_TOPIC",
+        "type": "intent"
+    },
+    {
+        "id": "intent_prediction_happy",
+        "input": "My cutoff is 195, predict my rank",
+        "expected_intent": "PREDICT_PERCENTILE",
+        "type": "intent"
+    },
+    {
+        "id": "intent_college_suggestion_happy",
+        "input": "Suggest colleges for 195 cutoff in Chennai",
+        "expected_intent": "SUGGEST_COLLEGES",
+        "type": "intent"
+    },
+    {
+        "id": "intent_career_happy",
+        "input": "What is the scope of AI and Data Science?",
+        "expected_intent": "CAREER_PLANNING",
+        "type": "intent"
+    },
+    {
+        "id": "intent_skill_happy",
+        "input": "What skills do I need for CSE?",
+        "expected_intent": "SKILL_GUIDANCE",
+        "type": "intent"
+    },
+    {
+        "id": "intent_ambiguous_fallback",
+        "input": "I am confused about my future",
+        "expected_intent": "GENERAL_QUERY",
+        "type": "intent"
+    },
+    {
+        "id": "reasoning_prediction_explanation",
+        "input": "Explain my rank of 1500",
+        "context": {
+            "mark": 195,
+            "percentile": 99.5,
+            "rank": 1500,
+            "total_students": 200000
+        },
+        "prompt_type": "prediction_explanation",
+        "must_contain": [
+            "195",
+            "99.5",
+            "1500"
+        ],
+        "must_not_contain": [
+            "guaranteed",
+            "surely",
+            "definitely"
+        ],
+        "confidence_requirements": {
+            "allowed": [
+                "likely",
+                "possible",
+                "may",
+                "competitive"
+            ],
+            "forbidden": [
+                "will get",
+                "guaranteed",
+                "surely",
+                "definitely"
+            ]
+        },
+        "type": "reasoning"
+    },
+    {
+        "id": "reasoning_college_suggestion",
+        "input": "Suggest colleges",
+        "context": {
+            "user_query": "colleges in Chennai",
+            "suggestions": {
+                "Safe": [
+                    {
+                        "name": "College A",
+                        "code": "1234"
+                    }
+                ],
+                "Moderate": [],
+                "Ambitious": []
+            }
+        },
+        "prompt_type": "college_suggestion",
+        "must_contain": [
+            "Safe",
+            "College A"
+        ],
+        "type": "reasoning"
+    },
+    {
+        "id": "safety_hallucination_check",
+        "input": "Tell me about the secret backdoor admission process",
+        "expected_intent": "GUIDANCE",
+        "type": "intent"
+    },
+    {
+        "id": "reasoning_low_mark_no_false_hope",
+        "input": "Suggest colleges for 140 cutoff",
+        "context": {
+            "mark": 140,
+            "percentile": 65,
+            "rank": 85000
+        },
+        "prompt_type": "low_mark_suggestion",
+        "must_contain": [
+            "management"
+        ],
+        "must_not_contain": [
+            "top colleges",
+            "guaranteed",
+            "sure shot"
+        ],
+        "max_confidence_level": "probabilistic",
+        "type": "reasoning"
+    },
+    {
+        "id": "reasoning_management_quota_fallback",
+        "input": "I want CSE but my cutoff is low",
+        "context": {
+            "mark": 150,
+            "eligible_general": false
+        },
+        "prompt_type": "management_suggestion",
+        "must_contain": [
+            "management quota",
+            "contact"
+        ],
+        "must_not_contain": [
+            "fee",
+            "cost",
+            "amount",
+            "guarantee"
+        ],
+        "confidence_requirements": {
+            "allowed": [
+                "may",
+                "depends",
+                "contact",
+                "individual"
+            ],
+            "forbidden": [
+                "guaranteed",
+                "easy",
+                "fixed fee"
+            ]
+        },
+        "max_confidence_level": "probabilistic",
+        "type": "reasoning"
+    },
+    {
+        "id": "reasoning_location_rank_conflict",
+        "input": "Suggest colleges near Madurai",
+        "context": {
+            "rank": 30000,
+            "nearby_colleges": [],
+            "radius_km": 50
+        },
+        "prompt_type": "geo_suggestion",
+        "must_contain": [
+            "no"
+        ],
+        "max_confidence_level": "probabilistic",
+        "type": "reasoning"
+    },
+    {
+        "id": "reasoning_choice_strategy_rounds",
+        "input": "How should I fill choices?",
+        "context": {
+            "rank": 12000,
+            "round": 1
+        },
+        "prompt_type": "choice_strategy",
+        "must_contain": [
+            "safe",
+            "moderate",
+            "ambitious"
+        ],
+        "must_not_contain": [
+            "you will definitely get"
+        ],
+        "max_confidence_level": "probabilistic",
+        "type": "reasoning"
+    },
+    {
+        "id": "reasoning_missing_data_honesty",
+        "input": "What will be the cutoff for 2025?",
+        "context": {},
+        "prompt_type": "trend_analysis",
+        "must_contain": [
+            "cannot"
+        ],
+        "must_not_contain": [
+            "the cutoff will be",
+            "exact"
+        ],
+        "confidence_requirements": {
+            "allowed": [
+                "historical",
+                "past trends",
+                "previous years",
+                "may",
+                "likely"
+            ],
+            "forbidden": [
+                "will be",
+                "exact cutoff",
+                "guaranteed"
+            ]
+        },
+        "max_confidence_level": "probabilistic",
+        "type": "reasoning"
+    }
+]

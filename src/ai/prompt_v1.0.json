@@ -1,0 +1,81 @@
+{
+    "version": "1.0",
+    "release_date": "2026-02-08",
+    "freeze_rules": {
+        "no_changes_without_full_test_suite_run": true,
+        "failed_safety_test_blocks_release": true,
+        "versioned_like_code": true
+    },
+    "prompts": {
+        "master_counsellor_agent": {
+            "file": "prompts.py",
+            "constant": "MASTER_SYSTEM_PROMPT",
+            "purpose": "Root agent guiding overall conversation",
+            "frozen": true
+        },
+        "intent_router": {
+            "file": "prompts.py",
+            "constant": "INTENT_ROUTER_PROMPT",
+            "purpose": "Classify user queries into intent categories",
+            "frozen": true
+        },
+        "prediction_explanation": {
+            "file": "prompts.py",
+            "constant": "RANK_PREDICTION_PROMPT",
+            "purpose": "Explain rank/percentile with numeric grounding",
+            "frozen": true,
+            "v1_fix": "Forces restatement of ALL numeric values"
+        },
+        "college_recommendation": {
+            "file": "prompts.py",
+            "constant": "COLLEGE_SUGGESTION_PROMPT",
+            "purpose": "Suggest safe/moderate/ambitious colleges",
+            "frozen": true
+        },
+        "management_quota_suggestion": {
+            "file": "prompts.py",
+            "constant": "MANAGEMENT_QUOTA_PROMPT",
+            "purpose": "Explain management quota as alternative pathway",
+            "frozen": true,
+            "v1_fix": "STRICTLY FORBIDDEN from mentioning fees/costs"
+        },
+        "location_based_search": {
+            "file": "prompts.py",
+            "constant": "LOCATION_FILTER_PROMPT",
+            "purpose": "Geographic filtering for nearby colleges",
+            "frozen": true
+        },
+        "choice_filling_strategy": {
+            "file": "prompts.py",
+            "constant": "CHOICE_FILLING_PROMPT",
+            "purpose": "Round-wise choice filling strategy",
+            "frozen": true
+        },
+        "trend_analysis": {
+            "file": "prompts.py",
+            "constant": "TREND_ANALYSIS_PROMPT",
+            "purpose": "Analyze trends without hallucinated predictions",
+            "frozen": true,
+            "v1_fix": "Enforces 'past/historical' language"
+        },
+        "career_skill_mapping": {
+            "file": "prompts.py",
+            "constant": "CAREER_MAPPING_PROMPT",
+            "purpose": "Map branches to career paths",
+            "frozen": true
+        },
+        "response_formatter": {
+            "file": "prompts.py",
+            "constant": "RESPONSE_FORMATTING_PROMPT",
+            "purpose": "Convert internal analysis to user-friendly output",
+            "frozen": true
+        }
+    },
+    "not_frozen_yet": [
+        "UI phrasing",
+        "Web skill search phrasing",
+        "Career descriptions (evolving)"
+    ],
+    "test_command": "python3 src/tests/test_harness.py",
+    "minimum_pass_rate": "100% on safety tests"
+}

@@ -1,0 +1,200 @@
+# Logs
+*.log
+*.out
+*.err
+logs/
+*.log.*
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.test
+.env.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vs/
+.atom/
+
+# Local configuration files
+config/local_settings.py
+settings_local.py
+local_config.json
+
+# Data and cache
+.cache/
+*.csv  # Be careful: only ignore temp CSVs, not important data
+tmp/
+temp/
+
+# Authentication and security
+.id_rsa
+.id_rsa.pub
+ssh/
+credentials.json
+secrets.json
+tokens.json
+keys.json
+.key
+.ppk
+.pem
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Browsers
+coverage/
+*.gcda
+*.gcno
+*.gcov
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# Package manager
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation builds
+_site/
+.sphinx/
+docs/_build/
+
+# Machine Learning specific
+model.pkl
+*.pkl
+*.pickle
+*.h5
+*.pt
+*.pth
+*.ckpt
+*.bin
+
+# Specific to TNEA AI project
+conversations/
+tnea_ai.log
+*.log
+data/csv/temp_*
+data/json/temp_*
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Certificate files
+*.crt
+*.key
+*.pem
+*.csr
+*.der
+*.p12
+*.pfx
+
+# Configuration backups
+config.bak
+config.backup
+*.config.bak
+
+# Session files
+*.session
+session.json
+sessions/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# IDE specific
+nbproject/
+nbproject/
+*.ipynb_checkpoints*
+
+# Distribution / packaging
+.pybuild/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Translations
+*.mo
+*.pot
+
+# Django specifics (if applicable)
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask specifics (if applicable)
+instance/
+.webassets-cache
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Coverage directory used by tools like tox
+.cover/
+
+# End of .gitignore.env

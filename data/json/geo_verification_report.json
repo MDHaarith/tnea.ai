@@ -1,0 +1,13 @@
+{
+  "summary": {
+    "total_colleges": 448,
+    "critical_issues": 0,
+    "warning_issues": 0
+  },
+  "issues": {
+    "outside_india": [],
+    "wrong_region": [],
+    "no_location": [],
+    "outside_tn": []
+  }
+}

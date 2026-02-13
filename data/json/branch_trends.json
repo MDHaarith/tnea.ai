@@ -1,0 +1,1108 @@
+{
+  "COMPUTER SCIENCE AND ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 1641,
+      "2021": 1846,
+      "2022": 1976,
+      "2023": 1948,
+      "2024": 1985,
+      "2025": 2073
+    },
+    "growth_rate": 26.3,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 11469
+  },
+  "ELECTRONICS AND COMMUNICATION ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 1086,
+      "2021": 1350,
+      "2022": 1551,
+      "2023": 1562,
+      "2024": 1576,
+      "2025": 1793
+    },
+    "growth_rate": 65.1,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 8918
+  },
+  "INFORMATION TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 700,
+      "2021": 817,
+      "2022": 1007,
+      "2023": 1181,
+      "2024": 1258,
+      "2025": 1443
+    },
+    "growth_rate": 106.1,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 6406
+  },
+  "ELECTRICAL AND ELECTRONICS ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 771,
+      "2021": 928,
+      "2022": 1024,
+      "2023": 1081,
+      "2024": 1081,
+      "2025": 1262
+    },
+    "growth_rate": 63.7,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 6147
+  },
+  "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE": {
+    "yearly_enrollment": {
+      "2020": 279,
+      "2021": 521,
+      "2022": 897,
+      "2023": 1251,
+      "2024": 1472,
+      "2025": 1644
+    },
+    "growth_rate": 489.2,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 6064
+  },
+  "MECHANICAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 732,
+      "2021": 959,
+      "2022": 906,
+      "2023": 1047,
+      "2024": 1047,
+      "2025": 1313
+    },
+    "growth_rate": 79.4,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 6004
+  },
+  "CIVIL ENGINEERING ": {
+    "yearly_enrollment": {
+      "2020": 509,
+      "2021": 591,
+      "2022": 536,
+      "2023": 612,
+      "2024": 632,
+      "2025": 808
+    },
+    "growth_rate": 58.7,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 3688
+  },
+  "BIO MEDICAL ENGINEERING ": {
+    "yearly_enrollment": {
+      "2020": 339,
+      "2021": 304,
+      "2022": 330,
+      "2023": 357,
+      "2024": 371,
+      "2025": 417
+    },
+    "growth_rate": 23.0,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 2118
+  },
+  "COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)": {
+    "yearly_enrollment": {
+      "2020": 6,
+      "2021": 6,
+      "2022": 140,
+      "2023": 305,
+      "2024": 467,
+      "2025": 615
+    },
+    "growth_rate": 10150.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 1539
+  },
+  "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)": {
+    "yearly_enrollment": {
+      "2020": 5,
+      "2021": 6,
+      "2022": 108,
+      "2023": 244,
+      "2024": 446,
+      "2025": 607
+    },
+    "growth_rate": 12040.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 1416
+  },
+  "COMPUTER SCIENCE AND BUSSINESS SYSTEM": {
+    "yearly_enrollment": {
+      "2020": 90,
+      "2021": 122,
+      "2022": 225,
+      "2023": 261,
+      "2024": 281,
+      "2025": 312
+    },
+    "growth_rate": 246.7,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 1291
+  },
+  "AGRICULTURAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 148,
+      "2021": 171,
+      "2022": 190,
+      "2023": 184,
+      "2024": 172,
+      "2025": 171
+    },
+    "growth_rate": 15.5,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 1036
+  },
+  "BIO TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 159,
+      "2021": 161,
+      "2022": 162,
+      "2023": 162,
+      "2024": 183,
+      "2025": 203
+    },
+    "growth_rate": 27.7,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 1030
+  },
+  "AERONAUTICAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 103,
+      "2021": 116,
+      "2022": 120,
+      "2023": 123,
+      "2024": 125,
+      "2025": 140
+    },
+    "growth_rate": 35.9,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 727
+  },
+  "CHEMICAL ENGINEERING ": {
+    "yearly_enrollment": {
+      "2020": 104,
+      "2021": 108,
+      "2022": 106,
+      "2023": 126,
+      "2024": 114,
+      "2025": 115
+    },
+    "growth_rate": 10.6,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 673
+  },
+  "MECHATRONICS ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 69,
+      "2021": 87,
+      "2022": 99,
+      "2023": 115,
+      "2024": 138,
+      "2025": 158
+    },
+    "growth_rate": 129.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 666
+  },
+  "FOOD TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 71,
+      "2021": 90,
+      "2022": 84,
+      "2023": 85,
+      "2024": 75,
+      "2025": 91
+    },
+    "growth_rate": 28.2,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 496
+  },
+  "ELECTRONICS AND INSTRUMENTATION ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 81,
+      "2021": 85,
+      "2022": 81,
+      "2023": 81,
+      "2024": 74,
+      "2025": 91
+    },
+    "growth_rate": 12.3,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 493
+  },
+  "AUTOMOBILE ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 55,
+      "2021": 85,
+      "2022": 56,
+      "2023": 87,
+      "2024": 73,
+      "2025": 82
+    },
+    "growth_rate": 49.1,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 438
+  },
+  "ROBOTICS AND AUTOMATION": {
+    "yearly_enrollment": {
+      "2020": 38,
+      "2021": 44,
+      "2022": 44,
+      "2023": 59,
+      "2024": 66,
+      "2025": 108
+    },
+    "growth_rate": 184.2,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 359
+  },
+  "ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING": {
+    "yearly_enrollment": {
+      "2020": 12,
+      "2021": 61,
+      "2022": 73,
+      "2023": 65,
+      "2024": 63,
+      "2025": 78
+    },
+    "growth_rate": 550.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 352
+  },
+  "COMPUTER SCIENCE AND DESIGN": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 35,
+      "2022": 53,
+      "2023": 61,
+      "2024": 51,
+      "2025": 55
+    },
+    "growth_rate": 57.1,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 255
+  },
+  "ELECTRONICS ENGINEERING (VLSI DESIGN AND TECHNOLOGY)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 31,
+      "2024": 91,
+      "2025": 122
+    },
+    "growth_rate": 293.5,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 244
+  },
+  "TEXTILE TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 37,
+      "2021": 36,
+      "2022": 33,
+      "2023": 26,
+      "2024": 24,
+      "2025": 26
+    },
+    "growth_rate": -29.7,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 182
+  },
+  "PHARMACEUTICAL TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 21,
+      "2021": 24,
+      "2022": 26,
+      "2023": 31,
+      "2024": 38,
+      "2025": 32
+    },
+    "growth_rate": 52.4,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 172
+  },
+  "COMPUTER AND COMMUNICATION ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 17,
+      "2021": 20,
+      "2022": 19,
+      "2023": 30,
+      "2024": 33,
+      "2025": 45
+    },
+    "growth_rate": 164.7,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 164
+  },
+  "COMPUTER SCIENCE AND ENGINEERING (INTERNET OF THINGS)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 27,
+      "2023": 40,
+      "2024": 40,
+      "2025": 48
+    },
+    "growth_rate": 77.8,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 155
+  },
+  "FASHION TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 28,
+      "2021": 20,
+      "2022": 25,
+      "2023": 25,
+      "2024": 23,
+      "2025": 26
+    },
+    "growth_rate": -7.1,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 147
+  },
+  "M.TECH. COMPUTER SCIENCE AND ENGINEERING (INTEGRATED 5 YEARS)": {
+    "yearly_enrollment": {
+      "2020": 5,
+      "2021": 23,
+      "2022": 24,
+      "2023": 24,
+      "2024": 29,
+      "2025": 36
+    },
+    "growth_rate": 620.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 141
+  },
+  "MEDICAL ELECTRONICS ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 19,
+      "2021": 23,
+      "2022": 24,
+      "2023": 26,
+      "2024": 20,
+      "2025": 25
+    },
+    "growth_rate": 31.6,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 137
+  },
+  "PRODUCTION ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 22,
+      "2021": 18,
+      "2022": 19,
+      "2023": 20,
+      "2024": 19,
+      "2025": 19
+    },
+    "growth_rate": -13.6,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 117
+  },
+  "CYBER SECURITY": {
+    "yearly_enrollment": {
+      "2020": 20,
+      "2021": 22,
+      "2022": 16,
+      "2023": 18,
+      "2024": 20,
+      "2025": 18
+    },
+    "growth_rate": -10.0,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 114
+  },
+  "AEROSPACE ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 20,
+      "2021": 20,
+      "2022": 21,
+      "2023": 18,
+      "2024": 15,
+      "2025": 19
+    },
+    "growth_rate": -5.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 113
+  },
+  "INSTRUMENTATION AND CONTROL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 16,
+      "2021": 16,
+      "2022": 15,
+      "2023": 18,
+      "2024": 17,
+      "2025": 20
+    },
+    "growth_rate": 25.0,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 102
+  },
+  "GEO INFORMATICS": {
+    "yearly_enrollment": {
+      "2020": 15,
+      "2021": 18,
+      "2022": 11,
+      "2023": 14,
+      "2024": 14,
+      "2025": 16
+    },
+    "growth_rate": 6.7,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 88
+  },
+  "MECHANICAL AND AUTOMATION ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 7,
+      "2021": 14,
+      "2022": 17,
+      "2023": 15,
+      "2024": 18,
+      "2025": 13
+    },
+    "growth_rate": 85.7,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 84
+  },
+  "PETRO CHEMICAL TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 8,
+      "2021": 7,
+      "2022": 7,
+      "2023": 18,
+      "2024": 19,
+      "2025": 25
+    },
+    "growth_rate": 212.5,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 84
+  },
+  "INDUSTRIAL BIO TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 13,
+      "2021": 12,
+      "2022": 13,
+      "2023": 12,
+      "2024": 13,
+      "2025": 18
+    },
+    "growth_rate": 38.5,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 81
+  },
+  "COMPUTER SCIENCE AND TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 13,
+      "2021": 16,
+      "2022": 17,
+      "2023": 17,
+      "2024": 11,
+      "2025": 6
+    },
+    "growth_rate": -53.8,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 80
+  },
+  "MANUFACTURING ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 12,
+      "2021": 14,
+      "2022": 12,
+      "2023": 14,
+      "2024": 13,
+      "2025": 13
+    },
+    "growth_rate": 8.3,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 78
+  },
+  "METALLURGICAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 13,
+      "2021": 13,
+      "2022": 12,
+      "2023": 14,
+      "2024": 11,
+      "2025": 14
+    },
+    "growth_rate": 7.7,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 77
+  },
+  "COMPUTER SCIENCE AND ENGINEERING (DATA SCIENCE)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 7,
+      "2022": 6,
+      "2023": 5,
+      "2024": 12,
+      "2025": 32
+    },
+    "growth_rate": 357.1,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 62
+  },
+  "ELECTRONICS AND COMMUNICATION (ADVANCED COMMUNICATION TECHNOLOGY)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 18,
+      "2024": 22,
+      "2025": 22
+    },
+    "growth_rate": 22.2,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 62
+  },
+  "PETROLEUM ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 12,
+      "2021": 10,
+      "2022": 3,
+      "2023": 6,
+      "2024": 10,
+      "2025": 15
+    },
+    "growth_rate": 25.0,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 56
+  },
+  "MARINE ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 11,
+      "2021": 19,
+      "2022": 11,
+      "2023": 3,
+      "2024": 2,
+      "2025": 2
+    },
+    "growth_rate": -81.8,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 48
+  },
+  "SAFETY AND FIRE ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 1,
+      "2021": 3,
+      "2022": 8,
+      "2023": 8,
+      "2024": 8,
+      "2025": 14
+    },
+    "growth_rate": 1300.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 42
+  },
+  "INDUSTRIAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 6,
+      "2021": 7,
+      "2022": 7,
+      "2023": 6,
+      "2024": 7,
+      "2025": 7
+    },
+    "growth_rate": 16.7,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 40
+  },
+  "LEATHER TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 7,
+      "2021": 7,
+      "2022": 6,
+      "2023": 7,
+      "2024": 6,
+      "2025": 7
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 40
+  },
+  "ELECTRICAL AND COMPUTER ENGINNERING": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 14,
+      "2025": 25
+    },
+    "growth_rate": 78.6,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 39
+  },
+  "RUBBER AND PLASTIC TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 7,
+      "2021": 6,
+      "2022": 7,
+      "2023": 6,
+      "2024": 6,
+      "2025": 6
+    },
+    "growth_rate": -14.3,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 38
+  },
+  "PLASTIC TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 7,
+      "2021": 6,
+      "2022": 6,
+      "2023": 6,
+      "2024": 7,
+      "2025": 6
+    },
+    "growth_rate": -14.3,
+    "trend": "decreasing",
+    "demand_level": "low",
+    "total_entries": 38
+  },
+  "MINING ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 6,
+      "2021": 6,
+      "2022": 7,
+      "2023": 6,
+      "2024": 6,
+      "2025": 6
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 37
+  },
+  "PRINTING AND PACKING TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 6,
+      "2021": 6,
+      "2022": 6,
+      "2023": 6,
+      "2024": 7,
+      "2025": 6
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 37
+  },
+  "HANDLOOM AND TEXTILE TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 5,
+      "2021": 6,
+      "2022": 5,
+      "2023": 6,
+      "2024": 7,
+      "2025": 7
+    },
+    "growth_rate": 40.0,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 36
+  },
+  "COMPUTER SCIENCE AND ENGINEERING (INTERNET OF THINGS AND CYBER SECURITY INCLUDING BLOCK CHAIN TECHNOLOGY)": {
+    "yearly_enrollment": {
+      "2020": 5,
+      "2021": 6,
+      "2022": 5,
+      "2023": 5,
+      "2024": 7,
+      "2025": 6
+    },
+    "growth_rate": 20.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 34
+  },
+  "INFORMATION SCIENCE AND ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 10,
+      "2021": 12,
+      "2022": 5,
+      "2023": 5,
+      "2024": 0,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 32
+  },
+  "MECHATRONICS": {
+    "yearly_enrollment": {
+      "2020": 9,
+      "2021": 10,
+      "2022": 8,
+      "2023": 1,
+      "2024": 0,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 28
+  },
+  "BIO TECHNOLOGY AND BIO CHEMICAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 1,
+      "2021": 3,
+      "2022": 4,
+      "2023": 4,
+      "2024": 6,
+      "2025": 6
+    },
+    "growth_rate": 500.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 24
+  },
+  "ELECTRONICS AND COMPUTER ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 7,
+      "2025": 16
+    },
+    "growth_rate": 128.6,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 23
+  },
+  "CIVIL AND STRUCTUTURAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 1,
+      "2021": 6,
+      "2022": 1,
+      "2023": 3,
+      "2024": 4,
+      "2025": 6
+    },
+    "growth_rate": 500.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 21
+  },
+  "ELECTRONICS AND TELECOMMUNICATION ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 4,
+      "2021": 5,
+      "2022": 6,
+      "2023": 6,
+      "2024": 0,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 21
+  },
+  "MECHANICAL ENGINEERING(AUTOMOBILE)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 9,
+      "2025": 11
+    },
+    "growth_rate": 22.2,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 20
+  },
+  "PETRO CHEMICAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 4,
+      "2021": 7,
+      "2022": 4,
+      "2023": 0,
+      "2024": 4,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 19
+  },
+  "MECHANICAL AND MECHATRONICS ENGINEERING (ADDITIVE MANUFACTURING)": {
+    "yearly_enrollment": {
+      "2020": 1,
+      "2021": 3,
+      "2022": 3,
+      "2023": 3,
+      "2024": 4,
+      "2025": 5
+    },
+    "growth_rate": 400.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 19
+  },
+  "COMPUTER TECHNOLOGY": {
+    "yearly_enrollment": {
+      "2020": 4,
+      "2021": 4,
+      "2022": 5,
+      "2023": 6,
+      "2024": 0,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 19
+  },
+  "MECHANICAL ENGINEERING (MANUFACTURING)": {
+    "yearly_enrollment": {
+      "2020": 1,
+      "2021": 4,
+      "2022": 1,
+      "2023": 1,
+      "2024": 5,
+      "2025": 5
+    },
+    "growth_rate": 400.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 17
+  },
+  "ELECTRONICS ENGINEERING(VLSI DESIGN AND TECHNOLOGY)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 6,
+      "2025": 7
+    },
+    "growth_rate": 16.7,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 13
+  },
+  "MECHANICAL AND SMART MANUFACTURING": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 5,
+      "2025": 7
+    },
+    "growth_rate": 40.0,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 12
+  },
+  "CIVIL ENGINEERING(ENVIRONMENTAL ENGINEERING)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 4,
+      "2025": 6
+    },
+    "growth_rate": 50.0,
+    "trend": "increasing",
+    "demand_level": "high",
+    "total_entries": 10
+  },
+  "ENVIRONMENTAL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 1,
+      "2022": 1,
+      "2023": 1,
+      "2024": 1,
+      "2025": 5
+    },
+    "growth_rate": 400.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 9
+  },
+  "B.PLAN": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 0,
+      "2025": 7
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 7
+  },
+  "ELECTRONICS INSTRUMENTATION AND CONTROL ENGINEERING": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 5,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 5
+  },
+  "INDUSTRIAL ENGINEERING AND MANAGEMENT": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 1,
+      "2022": 1,
+      "2023": 1,
+      "2024": 1,
+      "2025": 1
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 5
+  },
+  "ROBOTICS AND ARTIFICIAL INTELLIGENCE": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 0,
+      "2025": 5
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 5
+  },
+  "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 0,
+      "2025": 5
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 5
+  },
+  "BACHELOR OF DESIGN": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 1,
+      "2025": 3
+    },
+    "growth_rate": 200.0,
+    "trend": "booming",
+    "demand_level": "very_high",
+    "total_entries": 4
+  },
+  "TEXTILE CHEMISTRY": {
+    "yearly_enrollment": {
+      "2020": 1,
+      "2021": 1,
+      "2022": 1,
+      "2023": 1,
+      "2024": 0,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 4
+  },
+  "INTERIOR DESIGN": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 0,
+      "2022": 0,
+      "2023": 0,
+      "2024": 0,
+      "2025": 2
+    },
+    "growth_rate": 0.0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 2
+  },
+  "MECHANICAL ENGINEERING (SANDWICH)": {
+    "yearly_enrollment": {
+      "2020": 0,
+      "2021": 1,
+      "2022": 0,
+      "2023": 0,
+      "2024": 0,
+      "2025": 0
+    },
+    "growth_rate": 0,
+    "trend": "stable",
+    "demand_level": "medium",
+    "total_entries": 1
+  }
+}
