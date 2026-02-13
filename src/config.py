@@ -15,11 +15,27 @@ class Config:
     
     try:
         import streamlit as st
-        # Try loading from secrets if available
-        if "NVIDIA_API_KEY" in st.secrets:
-            os.environ["NVIDIA_API_KEY"] = st.secrets["NVIDIA_API_KEY"]
-        if "NVIDIA_API_BASE" in st.secrets:
-            os.environ["NVIDIA_API_BASE"] = st.secrets["NVIDIA_API_BASE"]
+        # Helper to get secrets from potentially nested TOML
+        def _get_secret(key, section=None):
+            if section and section in st.secrets and key in st.secrets[section]:
+                return st.secrets[section][key]
+            if key in st.secrets:
+                return st.secrets[key]
+            return None
+
+        # Load critical secrets into environment variables
+        api_key = _get_secret("NVIDIA_API_KEY", "nvidia")
+        if api_key: os.environ["NVIDIA_API_KEY"] = api_key
+        
+        api_base = _get_secret("NVIDIA_API_BASE", "nvidia")
+        if api_base: os.environ["NVIDIA_API_BASE"] = api_base
+        
+        model_name = _get_secret("MODEL_NAME", "nvidia")
+        if model_name: os.environ["MODEL_NAME"] = model_name
+
+        debug_val = _get_secret("DEBUG", "app")
+        if debug_val is not None: os.environ["DEBUG"] = str(debug_val)
+
     except ImportError:
         pass
     except FileNotFoundError:
