@@ -27,7 +27,7 @@ st.markdown("""
         background: linear-gradient(135deg, #F6E7BC 0%, #FFF8E1 100%);
     }
     .stChatMessage {
-        border-radius: 15px;
+        border-radius: 30px;
         padding: 15px;
         margin-bottom: 15px;
         box-shadow: 0 4px 6px rgba(11, 45, 114, 0.1);
@@ -46,7 +46,7 @@ st.markdown("""
         background: #ffffff;
         color: #0B2D72;
         padding: 15px;
-        border-radius: 10px;
+        border-radius: 30px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         border-left: 5px solid #0B2D72;
     }
@@ -54,7 +54,7 @@ st.markdown("""
         background: #ffffff;
         color: #0B2D72;
         padding: 15px;
-        border-radius: 10px;
+        border-radius: 30px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         border-left: 5px solid #0992C2;
     }
@@ -62,7 +62,7 @@ st.markdown("""
         background: #f8f9fa;
         color: #333333;
         padding: 15px;
-        border-radius: 10px;
+        border-radius: 30px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         border: 1px solid #e0e0e0;
         margin-bottom: 10px;
@@ -81,7 +81,7 @@ st.markdown("""
         background: linear-gradient(135deg, #0B2D72 0%, #0992C2 100%);
         color: #F6E7BC;
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 30px;
         margin-bottom: 20px;
     }
     .footer {
@@ -112,15 +112,17 @@ st.markdown("""
     /* Chat Input Styling */
     .stChatInput {
         border: 2px solid #0AC4E0 !important;
-        border-radius: 10px !important;
+        border-radius: 30px !important;
         padding: 0px !important;
         transition: all 0.3s ease;
         background-color: transparent !important;
     }
     .stChatInput > div {
+        border-radius: 30px !important;
         padding: 5px !important;
     }
     .stChatInput:focus-within {
+        border-radius: 30px !important;
         box-shadow: 0 0 15px rgba(10, 196, 224, 0.3) !important;
         border-color: #0992C2 !important;
         transform: translateY(-2px);
