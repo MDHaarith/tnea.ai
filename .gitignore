@@ -30,6 +30,8 @@ ehthumbs.db
 Thumbs.db
 desktop.ini
 
+data/ #NEW EDIT
+
 # Python
 __pycache__/
 *.py[cod]
