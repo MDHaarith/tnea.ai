@@ -112,7 +112,7 @@ st.markdown("""
     /* Chat Input Styling */
     .stChatInput {
         border: 2px solid #0AC4E0 !important;
-        border-radius: 15px !important;
+        border-radius: 10px !important;
         padding: 0px !important;
         transition: all 0.3s ease;
         background-color: transparent !important;
