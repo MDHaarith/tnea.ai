@@ -27,7 +27,7 @@ st.markdown("""
         background: linear-gradient(135deg, #F6E7BC 0%, #FFF8E1 100%);
     }
     .stChatMessage {
-        border-radius: 30px;
+        border-radius: 15px;
         padding: 15px;
         margin-bottom: 15px;
         box-shadow: 0 4px 6px rgba(11, 45, 114, 0.1);
@@ -112,7 +112,7 @@ st.markdown("""
     /* Chat Input Styling */
     .stChatInput {
         border: 2px solid #0AC4E0 !important;
-        border-radius: 10px !important;
+        border-radius: 30px !important;
         padding: 0px !important;
         transition: all 0.3s ease;
         background-color: transparent !important;
