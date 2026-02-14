@@ -23,144 +23,70 @@ st.set_page_config(
 # Custom CSS for Premium Design
 st.markdown("""
 <style>
-    /* Global Settings */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-    }
-    
     .main {
-        background-color: #ffffff;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
     }
-    
-    /* Remove top padding */
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 5rem;
-        max-width: 900px !important; 
-    }
-    
-    /* Hide Streamlit Branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    /* Chat Message Styling */
     .stChatMessage {
-        background-color: transparent !important;
-        border: none !important;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-    
     .stChatMessage.user {
-        background-color: transparent !important;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border: 1px solid #90caf9;
     }
-    
-    /* Avatar Styling */
-    .stChatMessage .avatar {
-        background-color: #ececec;
-        color: #333;
+    .stChatMessage.assistant {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid #e0e0e0;
     }
-    
-    /* Message Content */
-    .stMarkdown {
-        font-size: 16px;
-        line-height: 1.6;
-    }
-    
-    /* Input Area Styling */
-    .stChatInput {
-        position: fixed;
-        bottom: 20px;
-        max-width: 900px;
-        margin: 0 auto;
-        z-index: 1000;
-    }
-    
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
-        border-right: 1px solid #e0e0e0;
-    }
-    
-    /* Metric Cards */
     .metric-card {
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        border: 1px solid #eaeaea;
-        text-align: center;
-        transition: transform 0.2s;
+        background: #f0f7ff;
+        color: #333333;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 5px solid #2e7d32;
     }
-    .metric-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    .profile-card {
+        background: #f0f7ff;
+        color: #333333;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 5px solid #1976d2;
     }
-    
-    /* College Cards */
     .college-card {
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        border: 1px solid #eaeaea;
-        margin-bottom: 16px;
-        transition: all 0.2s ease;
+        background: #f8f9fa;
+        color: #333333;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #e0e0e0;
+        margin-bottom: 10px;
     }
-    .college-card:hover {
-        border-color: #2196f3;
-        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
+    .safe-college {
+        border-left: 5px solid #4caf50 !important;
     }
-    
-    .safe-college { border-left: 4px solid #4caf50 !important; }
-    .moderate-college { border-left: 4px solid #ff9800 !important; }
-    .ambitious-college { border-left: 4px solid #f44336 !important; }
-    
-    /* Headers */
-    h1, h2, h3 {
-        color: #202124;
-        font-weight: 600;
+    .moderate-college {
+        border-left: 5px solid #ff9800 !important;
     }
-    
-    /* Custom Header */
-    .custom-header {
+    .ambitious-college {
+        border-left: 5px solid #f44336 !important;
+    }
+    .header {
         text-align: center;
-        margin-bottom: 40px;
-        padding: 20px 0;
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
     }
-    
-    .custom-header h1 {
-        background: linear-gradient(90deg, #4285F4, #9B72CB);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-    }
-    
-    .custom-header p {
-        color: #5f6368;
-        font-size: 1.1rem;
-    }
-
-    /* Tabs/Navigation */
-    .stButton > button {
-        border-radius: 20px;
-        border: none;
-        background-color: #f1f3f4;
-        color: #3c4043;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    .stButton > button:hover {
-        background-color: #e8eaed;
-        color: #202124;
-    }
-    .stButton > button:focus {
-        background-color: #e8f0fe;
-        color: #1967d2;
-        border: 1px solid #1967d2;
+    .footer {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+        font-size: 0.9em;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -192,24 +118,22 @@ if "user_data" not in st.session_state:
     }
 
 # Header
-st.markdown('<div class="custom-header"><h1>TNEA AI Counsellor</h1><p>Your AI Companion for Engineering Admissions</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="header"><h1>🎓 TNEA AI Expert Counsellor</h1><h3>Advanced Engineering Admission Advisor</h3></div>', unsafe_allow_html=True)
 
 # Navigation
-st.markdown("---")
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    if st.button("💬 Chat", use_container_width=True, type="primary" if st.session_state.current_view == "chat" else "secondary"):
+    if st.button("💬 Chat", use_container_width=True):
         st.session_state.current_view = "chat"
 with col2:
-    if st.button("📊 Analytics", use_container_width=True, type="primary" if st.session_state.current_view == "analytics" else "secondary"):
+    if st.button("📊 Analytics", use_container_width=True):
         st.session_state.current_view = "analytics"
 with col3:
-    if st.button("📋 Recommendations", use_container_width=True, type="primary" if st.session_state.current_view == "recommendations" else "secondary"):
+    if st.button("📋 Recommendations", use_container_width=True):
         st.session_state.current_view = "recommendations"
 with col4:
-    if st.button("⚙️ Profile", use_container_width=True, type="primary" if st.session_state.current_view == "profile" else "secondary"):
+    if st.button("⚙️ Profile", use_container_width=True):
         st.session_state.current_view = "profile"
-st.markdown("---")
 
 # Sidebar - Student Profile
 with st.sidebar:
@@ -220,18 +144,16 @@ with st.sidebar:
     profile = st.session_state.agent.memory.user_profile
     
     with st.container():
-        st.caption("Your Current Stats")
-        col_s1, col_s2 = st.columns(2)
-        with col_s1:
-            st.metric("Rank", profile.get('rank') or "N/A")
-            st.metric("Cutoff", profile.get('mark') or "N/A")
-        with col_s2:
-            st.metric("Percentile", f"{profile.get('percentile') or 0:.1f}")
-            st.metric("Comm.", profile.get('community') or "OC")
-            
-        with st.expander("Show Details", expanded=False):
-            st.write(f"**Location:** {profile.get('preferred_location') or 'Any'}")
-            st.write(f"**Branch:** {profile.get('preferred_branch') or 'Any'}")
+        st.markdown(f"""
+        <div class="profile-card">
+            <strong>🏆 Estimated Rank:</strong> {profile.get('rank') or 'Pending'}<br>
+            <strong>🎯 Cutoff Mark:</strong> {profile.get('mark') or 'Not set'}<br>
+            <strong>📈 Percentile:</strong> {profile.get('percentile') or 'Pending'}<br>
+            <strong>📍 Location:</strong> {profile.get('preferred_location') or 'Not set'}<br>
+            <strong>🎓 Branch:</strong> {profile.get('preferred_branch') or 'Not set'}<br>
+            <strong>👥 Community:</strong> {profile.get('community') or 'OC'}
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -281,8 +203,7 @@ with st.sidebar:
 if st.session_state.current_view == "chat":
     # Display Chat History
     for message in st.session_state.messages:
-        avatar = "🧑‍🎓" if message["role"] == "user" else "🤖"
-        with st.chat_message(message["role"], avatar=avatar):
+        with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     # User Input
@@ -295,7 +216,7 @@ if st.session_state.current_view == "chat":
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         # Generate Assistant Response
-        with st.chat_message("assistant", avatar="🤖"):
+        with st.chat_message("assistant"):
             response_placeholder = st.empty()
             full_response = ""
             
@@ -564,4 +485,4 @@ elif st.session_state.current_view == "profile":
 
 # Footer
 st.markdown("---")
-st.caption("TNEA AI Expert Counsellor - Advanced Edition | © 2026")
+st.markdown('<div class="footer">TNEA AI Expert Counsellor - Advanced Edition | © 2026 | Designed for Tamil Nadu Engineering Aspirants</div>', unsafe_allow_html=True)
