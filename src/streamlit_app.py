@@ -24,37 +24,39 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        background: linear-gradient(135deg, #F6E7BC 0%, #FFF8E1 100%);
     }
     .stChatMessage {
         border-radius: 15px;
         padding: 15px;
         margin-bottom: 15px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(11, 45, 114, 0.1);
     }
     .stChatMessage.user {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border: 1px solid #90caf9;
+        background: linear-gradient(135deg, #0992C2 0%, #0AC4E0 100%);
+        border: 1px solid #0B2D72;
+        color: white;
     }
     .stChatMessage.assistant {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border: 1px solid #e0e0e0;
+        background: #ffffff;
+        border: 1px solid #0AC4E0;
+        color: #0B2D72;
     }
     .metric-card {
-        background: #f0f7ff;
-        color: #333333;
+        background: #ffffff;
+        color: #0B2D72;
         padding: 15px;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-left: 5px solid #2e7d32;
+        border-left: 5px solid #0B2D72;
     }
     .profile-card {
-        background: #f0f7ff;
-        color: #333333;
+        background: #ffffff;
+        color: #0B2D72;
         padding: 15px;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-left: 5px solid #1976d2;
+        border-left: 5px solid #0992C2;
     }
     .college-card {
         background: #f8f9fa;
@@ -76,8 +78,8 @@ st.markdown("""
     }
     .header {
         text-align: center;
-        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-        color: white;
+        background: linear-gradient(135deg, #0B2D72 0%, #0992C2 100%);
+        color: #F6E7BC;
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -85,10 +87,89 @@ st.markdown("""
     .footer {
         text-align: center;
         padding: 20px;
-        color: #666;
+        color: #0B2D72;
         font-size: 0.9em;
     }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .stChatMessage {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .header {
+            padding: 15px;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        .header h3 {
+            font-size: 1rem;
+        }
+        .metric-card, .profile-card, .college-card {
+            margin-bottom: 10px;
+        }
+    }
+    /* Chat Input Styling */
+    .stChatInput {
+        border: 2px solid #0AC4E0 !important;
+        border-radius: 30px !important;
+        padding: 0px !important;
+        transition: all 0.3s ease;
+        background-color: transparent !important;
+    }
+    .stChatInput > div {
+        padding: 5px !important;
+    }
+    .stChatInput:focus-within {
+        box-shadow: 0 0 15px rgba(10, 196, 224, 0.3) !important;
+        border-color: #0992C2 !important;
+        transform: translateY(-2px);
+    }
 </style>
+
+<script>
+    function scrollToBottom() {
+        const messages = parent.document.querySelector('[data-testid="stChatMessageContainer"]') || 
+                        parent.document.querySelector('.stChatMessageContainer');
+        if (messages) {
+            messages.scrollTop = messages.scrollHeight;
+        }
+    }
+    
+    function focusChatInput() {
+        const input = parent.document.querySelector('textarea[data-testid="stChatInputTextArea"]');
+        if (input) {
+            input.focus();
+        }
+    }
+
+    // Observer to watch for new messages and scroll
+    const observer = new MutationObserver((mutations) => {
+        scrollToBottom();
+        // Also check if input became available/needs focus
+        if (!parent.document.activeElement || parent.document.activeElement.tagName !== 'TEXTAREA') {
+            focusChatInput();
+        }
+    });
+    
+    const config = { childList: true, subtree: true };
+    const target = parent.document.querySelector('[data-testid="stChatMessageContainer"]') || 
+                  parent.document.querySelector('.stChatMessageContainer');
+                  
+    // Also observe the main container for view changes
+    const mainContainer = parent.document.querySelector('.main');
+    
+    if (target) {
+        observer.observe(target, config);
+        scrollToBottom(); 
+    }
+    if (mainContainer) {
+        observer.observe(mainContainer, config);
+    }
+    
+    // Initial focus attempt
+    setTimeout(focusChatInput, 500);
+</script>
 """, unsafe_allow_html=True)
 
 # Initialize Session State
@@ -121,19 +202,24 @@ if "user_data" not in st.session_state:
 st.markdown('<div class="header"><h1>🎓 TNEA AI Expert Counsellor</h1><h3>Advanced Engineering Admission Advisor</h3></div>', unsafe_allow_html=True)
 
 # Navigation
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    if st.button("💬 Chat", use_container_width=True):
-        st.session_state.current_view = "chat"
-with col2:
-    if st.button("📊 Analytics", use_container_width=True):
-        st.session_state.current_view = "analytics"
-with col3:
-    if st.button("📋 Recommendations", use_container_width=True):
-        st.session_state.current_view = "recommendations"
-with col4:
-    if st.button("⚙️ Profile", use_container_width=True):
-        st.session_state.current_view = "profile"
+with st.container():
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("💬 Chat", use_container_width=True, type="primary" if st.session_state.current_view == "chat" else "secondary"):
+            st.session_state.current_view = "chat"
+            st.rerun()
+    with col2:
+        if st.button("📊 Analytics", use_container_width=True, type="primary" if st.session_state.current_view == "analytics" else "secondary"):
+            st.session_state.current_view = "analytics"
+            st.rerun()
+    with col3:
+        if st.button("📋 Recommend", use_container_width=True, type="primary" if st.session_state.current_view == "recommendations" else "secondary"):
+            st.session_state.current_view = "recommendations"
+            st.rerun()
+    with col4:
+        if st.button("⚙️ Profile", use_container_width=True, type="primary" if st.session_state.current_view == "profile" else "secondary"):
+            st.session_state.current_view = "profile"
+            st.rerun()
 
 # Sidebar - Student Profile
 with st.sidebar:
@@ -157,33 +243,9 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Quick Actions
-    st.subheader("⚡ Quick Actions")
-    
-    # Input form for profile updates
-    with st.form("profile_form"):
-        mark_input = st.number_input("Cutoff Mark", min_value=0.0, max_value=200.0, value=float(profile.get('mark') or 0.0), step=0.1)
-        location_input = st.text_input("Preferred Location", value=profile.get('preferred_location') or "")
-        branch_input = st.text_input("Preferred Branch", value=profile.get('preferred_branch') or "")
-        community_input = st.selectbox("Community", ["OC", "BC", "BCM", "MBC", "SC", "SCA", "ST"], index=["OC", "BC", "BCM", "MBC", "SC", "SCA", "ST"].index(profile.get('community', 'OC')))
-        
-        submitted = st.form_submit_button("Update Profile")
-        
-        if submitted:
-            st.session_state.agent.memory.update_profile("mark", mark_input)
-            st.session_state.agent.memory.update_profile("preferred_location", location_input)
-            st.session_state.agent.memory.update_profile("preferred_branch", branch_input)
-            st.session_state.agent.memory.update_profile("community", community_input)
-            
-            # Update user_data as well
-            st.session_state.user_data["mark"] = mark_input
-            st.session_state.user_data["location"] = location_input
-            st.session_state.user_data["branch"] = branch_input
-            st.session_state.user_data["community"] = community_input
-            
-            st.success("Profile updated successfully!")
     
     st.markdown("---")
+
     
     # Save/Load Info
     st.subheader("💾 Session")
@@ -195,9 +257,50 @@ with st.sidebar:
         st.session_state.agent.memory.save_to_json()
         st.rerun()
 
-    if st.button("📊 Export Data", use_container_width=True):
-        # Export functionality would go here
-        st.info("Data export feature coming soon!")
+    with st.expander("📊 Export Data", expanded=False):
+        # Prepare data for export
+        export_data = {
+            "profile": st.session_state.agent.memory.user_profile,
+            "session_id": st.session_state.session_id,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # JSON Export
+        import json
+        json_str = json.dumps(export_data, indent=2)
+        st.download_button(
+            label="Download as JSON",
+            data=json_str,
+            file_name=f"tnea_data_{st.session_state.session_id}.json",
+            mime="application/json",
+            use_container_width=True
+        )
+        
+        # Excel Export
+        try:
+            import io
+            # Flatten profile for Excel
+            flat_profile = pd.DataFrame([st.session_state.agent.memory.user_profile])
+            
+            # Create Excel file in memory
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                flat_profile.to_excel(writer, sheet_name='Profile', index=False)
+                
+                # Chat History
+                if st.session_state.messages:
+                    chat_df = pd.DataFrame(st.session_state.messages)
+                    chat_df.to_excel(writer, sheet_name='Chat History', index=False)
+            
+            st.download_button(
+                label="Download as Excel",
+                data=buffer.getvalue(),
+                file_name=f"tnea_data_{st.session_state.session_id}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+        except Exception as e:
+            st.error(f"Excel export not available: {e}")
 
 # Main Content Area
 if st.session_state.current_view == "chat":
@@ -227,6 +330,24 @@ if st.session_state.current_view == "chat":
                     response_placeholder.markdown(full_response + "▌")
                 
                 response_placeholder.markdown(full_response)
+                
+                # Auto-scroll and focus after response
+                st.components.v1.html(
+                    """
+                    <script>
+                        var chatContainer = window.parent.document.querySelector('[data-testid="stChatMessageContainer"]');
+                        if (chatContainer) {
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
+                        var input = window.parent.document.querySelector('textarea[data-testid="stChatInputTextArea"]');
+                        if (input) {
+                            input.focus();
+                        }
+                    </script>
+                    """,
+                    height=0,
+                    width=0,
+                )
                 
                 # Add to history
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
