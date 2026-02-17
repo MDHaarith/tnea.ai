@@ -16,13 +16,12 @@ class TrendAnalysis:
         """
         # Collect all cutoff records for this branch across years
         branch_upper = branch_code.upper().strip()
-        branch_records = []
+        # Use data engine's filtered query instead of iterating all records
+        branch_records = self.data_engine.get_cutoffs_by_branch(branch_upper)
+                    
+        # Filter further if needed (SQL does strict match, maybe we need fuzzy? SQL works for now)
+        # If the SQL returns records, we are good.
         
-        for c in self.data_engine.cutoffs:
-            bc = (c.get('branch_code') or '').upper().strip()
-            bn = (c.get('branch_name') or '').upper()
-            if bc == branch_upper or branch_upper in bn:
-                branch_records.append(c)
         
         if not branch_records:
             return f"No historical cutoff data available for branch '{branch_code}'."
@@ -94,35 +93,50 @@ class TrendAnalysis:
 
     def get_rising_branches(self, top_n: int = 5) -> str:
         """Identify branches with the biggest cutoff increases."""
-        branch_changes = {}
-        
-        for c in self.data_engine.cutoffs:
-            bc = c.get('branch_code', '')
-            year = c.get('year')
-            oc = (c.get('cutoffs') or {}).get('OC')
-            if bc and year and oc is not None:
+        if not self.data_engine.conn:
+            return "Trend data unavailable."
+            
+        try:
+            cursor = self.data_engine.conn.cursor()
+            query = """
+                SELECT branch_code, year, AVG(oc) as avg_cutoff 
+                FROM cutoffs 
+                WHERE oc IS NOT NULL 
+                GROUP BY branch_code, year
+            """
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            
+            branch_changes = {}
+            for r in rows:
+                bc = r['branch_code']
+                year = r['year']
+                avg = r['avg_cutoff']
+                
                 if bc not in branch_changes:
                     branch_changes[bc] = {}
-                if year not in branch_changes[bc]:
-                    branch_changes[bc][year] = []
-                branch_changes[bc][year].append(float(oc))
-        
-        trends = []
-        for bc, year_data in branch_changes.items():
-            years = sorted(year_data.keys())
-            if len(years) >= 2:
-                first_avg = sum(year_data[years[0]]) / len(year_data[years[0]])
-                last_avg = sum(year_data[years[-1]]) / len(year_data[years[-1]])
-                trends.append((bc, last_avg - first_avg, last_avg))
-        
-        trends.sort(key=lambda x: x[1], reverse=True)
-        
-        lines = ["📈 **Rising Demand Branches (Biggest Cutoff Increase):**"]
-        for bc, change, latest in trends[:top_n]:
-            lines.append(f"- **{bc}**: +{change:.1f} marks (latest avg: {latest:.1f})")
-        
-        lines.append("\n📉 **Declining Demand Branches:**")
-        for bc, change, latest in trends[-top_n:]:
-            lines.append(f"- **{bc}**: {change:.1f} marks (latest avg: {latest:.1f})")
-        
-        return "\n".join(lines)
+                branch_changes[bc][year] = avg
+                
+            trends = []
+            for bc, year_data in branch_changes.items():
+                years = sorted(year_data.keys())
+                if len(years) >= 2:
+                    first_avg = year_data[years[0]]
+                    last_avg = year_data[years[-1]]
+                    trends.append((bc, last_avg - first_avg, last_avg))
+            
+            trends.sort(key=lambda x: x[1], reverse=True)
+            
+            lines = ["📈 **Rising Demand Branches (Biggest Cutoff Increase):**"]
+            for bc, change, latest in trends[:top_n]:
+                lines.append(f"- **{bc}**: +{change:.1f} marks (latest avg: {latest:.1f})")
+            
+            lines.append("\n📉 **Declining Demand Branches:**")
+            for bc, change, latest in trends[-top_n:]:
+                lines.append(f"- **{bc}**: {change:.1f} marks (latest avg: {latest:.1f})")
+            
+            return "\n".join(lines)
+            
+        except Exception as e:
+            logger.error(f"Error in get_rising_branches: {e}")
+            return "Error calculating trends."

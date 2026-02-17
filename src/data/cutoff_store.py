@@ -12,4 +12,4 @@ class CutoffStore:
         # This might be slow if implemented naively in loader, assuming we just filter the full list
         # For now, we rely on loader's comprehensive list if available, or just implement filtering here
         # But data_engine.cutoffs is the master list
-        return [c for c in self.data_engine.cutoffs if str(c.get('branch_code')) == str(branch_code)]
+        return self.data_engine.get_cutoffs_by_branch(branch_code)

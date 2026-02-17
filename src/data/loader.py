@@ -4,6 +4,7 @@ import pandas as pd
 from typing import List, Dict, Optional
 from functools import lru_cache
 import os
+import sqlite3
 
 logger = logging.getLogger("tnea_ai.data")
 
@@ -30,21 +31,25 @@ class DataEngine:
         self.college_locations = []
         self.branches = []
         self.branch_trends = {}
-        self.cutoffs = []
-        self.seats = []
+        # self.cutoffs = [] # Removed in favor of SQLite
+        # self.seats = []   # Removed in favor of SQLite
         self.guidelines = ""
         self.percentile_ranges = None
         
-        # Indexes for fast lookup
-        self._cutoff_index: Dict[str, List[Dict]] = {}
-        self._seat_index: Dict[str, List[Dict]] = {}
+        # SQLite Connection
+        self.db_path = os.path.join(self.data_dir, "tnea.db")
+        self.conn = None
+        try:
+            self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            self.conn.row_factory = sqlite3.Row
+        except Exception as e:
+            logger.error(f"Failed to connect to SQLite DB at {self.db_path}: {e}")
             
         self.load_data()
-        self._build_indexes()
         self._initialized = True
 
     def load_data(self):
-        """Loads all necessary data files."""
+        """Loads all necessary data files (small JSONs only)."""
         try:
             with open(os.path.join(self.data_dir, "json/colleges.json"), "r") as f:
                 self.colleges = json.load(f)
@@ -58,13 +63,9 @@ class DataEngine:
             with open(os.path.join(self.data_dir, "json/branch_trends.json"), "r") as f:
                 self.branch_trends = json.load(f)
 
-            with open(os.path.join(self.data_dir, "json/cutoffs.json"), "r") as f:
-                self.cutoffs = json.load(f)
-
-            with open(os.path.join(self.data_dir, "json/seats.json"), "r") as f:
-                self.seats = json.load(f)
+            # cutoffs.json and seats.json are now in SQLite
                 
-            logger.info(f"Loaded {len(self.colleges)} colleges, {len(self.cutoffs)} cutoffs, {len(self.seats)} seats")
+            logger.info(f"Loaded {len(self.colleges)} colleges from JSON")
             
             # Merge precise geo-locations
             if self.college_locations:
@@ -97,24 +98,6 @@ class DataEngine:
         except Exception as e:
             logger.error(f"Error loading text data: {e}")
 
-    def _build_indexes(self):
-        """Build hash indexes for O(1) lookup by college_code."""
-        self._cutoff_index = {}
-        for c in self.cutoffs:
-            code = str(c.get('college_code'))
-            if code not in self._cutoff_index:
-                self._cutoff_index[code] = []
-            self._cutoff_index[code].append(c)
-        
-        self._seat_index = {}
-        for s in self.seats:
-            code = str(s.get('college_code'))
-            if code not in self._seat_index:
-                self._seat_index[code] = []
-            self._seat_index[code].append(s)
-        
-        logger.info(f"Built indexes: {len(self._cutoff_index)} college cutoff groups, {len(self._seat_index)} college seat groups")
-
     def get_college_by_code(self, code: str) -> Optional[Dict]:
         """Retrieves college details by code."""
         for college in self.colleges:
@@ -145,28 +128,86 @@ class DataEngine:
         return self.branch_trends.get(branch_code, {})
 
     def get_college_cutoffs(self, college_code: str) -> List[Dict]:
-        """Retrieves cutoff data for a college using index (O(1))."""
-        return self._cutoff_index.get(str(college_code), [])
+        """Retrieves cutoff data for a college from SQLite."""
+        if not self.conn:
+            return []
+        
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT * FROM cutoffs WHERE college_code = ?", (college_code,))
+            rows = cursor.fetchall()
+            
+            results = []
+            for row in rows:
+                r = dict(row)
+                # Reconstruct nested structure for compatibility
+                cutoffs = {
+                    'OC': r['oc'], 'BC': r['bc'], 'BCM': r['bcm'], 'MBC': r['mbc'], 
+                    'SC': r['sc'], 'SCA': r['sca'], 'ST': r['st']
+                }
+                ranks = {
+                    'OC': r['oc_rank'], 'BC': r['bc_rank'], 'BCM': r['bcm_rank'], 'MBC': r['mbc_rank'], 
+                    'SC': r['sc_rank'], 'SCA': r['sca_rank'], 'ST': r['st_rank']
+                }
+                results.append({
+                    'college_code': r['college_code'],
+                    'college_name': r['college_name'],
+                    'branch_code': r['branch_code'],
+                    'branch_name': r['branch_name'],
+                    'year': r['year'],
+                    'district': r['district'],
+                    'cutoffs': cutoffs,
+                    'ranks': ranks
+                })
+            return results
+        except Exception as e:
+            logger.error(f"DB Error get_college_cutoffs: {e}")
+            return []
 
-    def get_college_seats(self, college_code: str) -> List[Dict]:
-        """Retrieves seat matrix for a college using index (O(1))."""
-        return self._seat_index.get(str(college_code), [])
+    def get_cutoffs_by_branch(self, branch_code: str) -> List[Dict]:
+        """Retrieves all cutoff records for a specific branch."""
+        if not self.conn:
+            return []
+            
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT * FROM cutoffs WHERE branch_code = ?", (branch_code,))
+            rows = cursor.fetchall()
+            
+            results = []
+            for row in rows:
+                r = dict(row)
+                cutoffs = {
+                    'OC': r['oc'], 'BC': r['bc'], 'BCM': r['bcm'], 'MBC': r['mbc'], 
+                    'SC': r['sc'], 'SCA': r['sca'], 'ST': r['st']
+                }
+                results.append({
+                    'college_code': r['college_code'],
+                    'branch_code': r['branch_code'],
+                    'branch_name': r['branch_name'],
+                    'year': r['year'],
+                    'cutoffs': cutoffs
+                })
+            return results
+        except Exception as e:
+            logger.error(f"DB Error get_cutoffs_by_branch: {e}")
+            return []
 
-    def get_total_seats_for_college(self, college_code: str, branch_code: str = None) -> int:
-        """Get total seat count for a college, optionally filtered by branch."""
-        seats = self.get_college_seats(str(college_code))
-        total = 0
-        for s in seats:
-            if branch_code and str(s.get('branch_code', '')) != str(branch_code):
-                continue
-            # 'total' field is the seat count; 'seats' is a dict of community-wise breakdown
-            seat_val = s.get('total', 0)
-            if isinstance(seat_val, (int, float)):
-                total += int(seat_val)
-            elif isinstance(seat_val, str) and seat_val.isdigit():
-                total += int(seat_val)
-        return total
+    def get_total_seats_for_college(self, college_code: str, branch_code: str) -> int:
+        """Retrieves total seats for a college+branch from SQLite."""
+        if not self.conn:
+            return 0
+            
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT total FROM seats WHERE college_code = ? AND branch_code = ?", (college_code, branch_code))
+            row = cursor.fetchone()
+            return row['total'] if row else 0
+        except Exception as e:
+            logger.error(f"DB Error get_seats: {e}")
+            return 0
 
+    
     def get_guidelines(self) -> str:
         """Returns the TNEA guidelines text."""
         return self.guidelines
