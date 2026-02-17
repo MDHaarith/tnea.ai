@@ -11,6 +11,8 @@ sys.path.append(os.path.dirname(__file__))
 
 from agent.counsellor_agent import CounsellorAgent
 from agent.session_memory import SessionMemory
+from web.map_component import MapComponent
+from web.compare_component import CompareComponent
 
 # Page Config
 st.set_page_config(
@@ -188,6 +190,8 @@ if "agent" not in st.session_state:
     memory = SessionMemory(session_id=st.session_state.session_id)
     # The agent uses the provided memory
     st.session_state.agent = CounsellorAgent(memory=memory)
+    st.session_state.map_component = MapComponent(st.session_state.agent.data_engine)
+    st.session_state.compare_component = CompareComponent(st.session_state.agent.data_engine)
 
 if "current_view" not in st.session_state:
     st.session_state.current_view = "chat"
@@ -207,20 +211,28 @@ st.markdown('<div class="header"><h1>🎓 TNEA AI Expert Counsellor</h1><h3>Adva
 
 # Navigation
 with st.container():
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
     with col1:
         if st.button("💬 Chat", use_container_width=True, type="primary" if st.session_state.current_view == "chat" else "secondary"):
             st.session_state.current_view = "chat"
             st.rerun()
     with col2:
-        if st.button("📊 Analytics", use_container_width=True, type="primary" if st.session_state.current_view == "analytics" else "secondary"):
-            st.session_state.current_view = "analytics"
+        if st.button("🔍 Search", use_container_width=True, type="primary" if st.session_state.current_view == "search" else "secondary"):
+            st.session_state.current_view = "search"
             st.rerun()
     with col3:
         if st.button("📋 Recommend", use_container_width=True, type="primary" if st.session_state.current_view == "recommendations" else "secondary"):
             st.session_state.current_view = "recommendations"
             st.rerun()
     with col4:
+        if st.button("⚖️ Compare", use_container_width=True, type="primary" if st.session_state.current_view == "compare" else "secondary"):
+            st.session_state.current_view = "compare"
+            st.rerun()
+    with col5:
+        if st.button("📊 Analytics", use_container_width=True, type="primary" if st.session_state.current_view == "analytics" else "secondary"):
+            st.session_state.current_view = "analytics"
+            st.rerun()
+    with col6:
         if st.button("⚙️ Profile", use_container_width=True, type="primary" if st.session_state.current_view == "profile" else "secondary"):
             st.session_state.current_view = "profile"
             st.rerun()
@@ -325,39 +337,51 @@ if st.session_state.current_view == "chat":
         # Generate Assistant Response
         with st.chat_message("assistant"):
             response_placeholder = st.empty()
-            full_response = ""
             
+            async def run_agent_stream():
+                full_response = ""
+                try:
+                    # use generator from agent
+                    async for chunk in st.session_state.agent.process_query_stream(prompt):
+                        full_response += chunk
+                        response_placeholder.markdown(full_response + "▌")
+                    return full_response
+                except Exception as e:
+                    return f"Error: {e}"
+
+            import asyncio
             try:
-                # use generator from agent
-                for chunk in st.session_state.agent.process_query_stream(prompt):
-                    full_response += chunk
-                    response_placeholder.markdown(full_response + "▌")
+                full_response = asyncio.run(run_agent_stream())
                 
-                response_placeholder.markdown(full_response)
+                # If it started with Error:, handle gracefully
+                if full_response and full_response.startswith("Error:"):
+                     st.error(full_response)
+                else:
+                    response_placeholder.markdown(full_response)
                 
-                # Auto-scroll and focus after response
-                st.components.v1.html(
-                    """
-                    <script>
-                        var chatContainer = window.parent.document.querySelector('[data-testid="stChatMessageContainer"]');
-                        if (chatContainer) {
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
-                        }
-                        var input = window.parent.document.querySelector('textarea[data-testid="stChatInputTextArea"]');
-                        if (input) {
-                            input.focus();
-                        }
-                    </script>
-                    """,
-                    height=0,
-                    width=0,
-                )
-                
-                # Add to history
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    # Auto-scroll and focus after response
+                    st.components.v1.html(
+                        """
+                        <script>
+                            var chatContainer = window.parent.document.querySelector('[data-testid="stChatMessageContainer"]');
+                            if (chatContainer) {
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            }
+                            var input = window.parent.document.querySelector('textarea[data-testid="stChatInputTextArea"]');
+                            if (input) {
+                                input.focus();
+                            }
+                        </script>
+                        """,
+                        height=0,
+                        width=0,
+                    )
+                    
+                    # Add to history
+                    st.session_state.messages.append({"role": "assistant", "content": full_response})
                 
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error(f"Error executing async agent: {e}")
                 full_response = "I encountered an error while processing your request. Please try again."
                 response_placeholder.markdown(full_response)
 
@@ -474,7 +498,11 @@ elif st.session_state.current_view == "recommendations":
                     enriched = st.session_state.agent._filter_by_branch(enriched, profile.get('preferred_branch'))
                 
                 if enriched:
-                    categorized = st.session_state.agent.choice_strategy.categorize_options(user_mark, enriched)
+                    categorized = st.session_state.agent.choice_strategy.categorize_options(
+                        user_mark, 
+                        enriched, 
+                        user_location=profile.get('preferred_location')
+                    )
                     
                     # Display categorized recommendations
                     # Display categorized recommendations
@@ -485,7 +513,8 @@ elif st.session_state.current_view == "recommendations":
                     def process_category(category_name, colleges, chance_label):
                         for college in colleges:
                             cutoff_val = float(college.get('cutoff_mark', 0))
-                            est_percentile = st.session_state.agent.predictor.predict_percentile(cutoff_val)
+                            p_res = st.session_state.agent.predictor.predict_percentile(cutoff_val)
+                            est_percentile = p_res['prediction'] if isinstance(p_res, dict) else p_res
                             est_rank = st.session_state.agent.predictor.predict_rank(est_percentile)
                             
                             diff = abs(user_mark - cutoff_val)
@@ -497,6 +526,7 @@ elif st.session_state.current_view == "recommendations":
                                 "Branch": college.get('branch_name', 'N/A'),
                                 "Chance": chance_label,
                                 "Match %": match_score,
+                                "Score": college.get('quality_score', 0),
                                 "Cutoff": cutoff_val,
                                 "Est. Rank": est_rank,
                                 "District": college.get('district', 'N/A'),
@@ -519,7 +549,7 @@ elif st.session_state.current_view == "recommendations":
                         st.markdown(f"### Found {len(df)} Colleges matching your criteria")
                         
                         # Configure Columns
-                        with st.expander("📊 View Detailed College Recommendations Table", expanded=False):
+                        with st.expander("📊 View Detailed College Recommendations Table", expanded=True):
                             st.dataframe(
                                 df,
                                 column_config={
@@ -529,6 +559,13 @@ elif st.session_state.current_view == "recommendations":
                                         "Approval Chance",
                                         help="Estimated probability of admission",
                                         width="small",
+                                    ),
+                                    "Score": st.column_config.ProgressColumn(
+                                        "Quality Score",
+                                        help="Composite score based on Placement, Autonomous status, Cutoff, etc.",
+                                        format="%.1f",
+                                        min_value=0,
+                                        max_value=100,
                                     ),
                                     "Match %": st.column_config.ProgressColumn(
                                         "Match Score",
@@ -609,6 +646,172 @@ elif st.session_state.current_view == "profile":
     with col2:
         st.metric("Percentile", f"{profile.get('percentile') or 0:.2f}%" if profile.get('percentile') else "Pending")
         st.metric("Community", profile.get('community') or "OC")
+
+
+elif st.session_state.current_view == "search":
+    st.header("🔍 Search Colleges")
+    
+    # Simple search interface
+    search_query = st.text_input("Enter College Name or District to Search", placeholder="e.g. CEG, Coimbatore, PSG")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.info("Switch to 'Map View' tab to see locations.")
+    with col2:
+        pass
+
+    tab1, tab2 = st.tabs(["List View", "Map View"])
+    
+    # Filter Logic
+    filtered_colleges = []
+    if search_query:
+        search_lower = search_query.lower()
+        filtered_colleges = [
+            c for c in st.session_state.agent.data_engine.colleges
+            if search_lower in c.get('name', '').lower() or search_lower in c.get('district', '').lower()
+        ]
+    else:
+        # Show all colleges by default if no query
+        filtered_colleges = st.session_state.agent.data_engine.colleges
+    
+    
+    # Reset pagination if search changes
+    if 'last_search' not in st.session_state:
+        st.session_state.last_search = search_query
+    
+    if search_query != st.session_state.last_search:
+        st.session_state.list_view_page = 1
+        st.session_state.last_search = search_query
+
+    # Pagination State
+    if 'list_view_page' not in st.session_state:
+        st.session_state.list_view_page = 1
+        
+    ITEMS_PER_PAGE = 20
+    
+    with tab1:
+        total_items = len(filtered_colleges)
+        total_pages = (total_items - 1) // ITEMS_PER_PAGE + 1
+        
+        # Ensure page is valid
+        if st.session_state.list_view_page > total_pages:
+            st.session_state.list_view_page = max(1, total_pages)
+            
+        start_idx = (st.session_state.list_view_page - 1) * ITEMS_PER_PAGE
+        end_idx = min(start_idx + ITEMS_PER_PAGE, total_items)
+        
+        paginated_colleges = filtered_colleges[start_idx:end_idx]
+        
+        # Pagination Controls (Top)
+        col_prev, col_info, col_next = st.columns([1, 2, 1])
+        with col_prev:
+            if st.session_state.list_view_page > 1:
+                if st.button("⬅️ Previous", key="prev_btn_top"):
+                    st.session_state.list_view_page -= 1
+                    st.rerun()
+        with col_info:
+            st.markdown(f"<div style='text-align: center'>Showing {start_idx + 1}-{end_idx} of {total_items} colleges</div>", unsafe_allow_html=True)
+        with col_next:
+            if st.session_state.list_view_page < total_pages:
+                if st.button("Next ➡️", key="next_btn_top"):
+                    st.session_state.list_view_page += 1
+                    st.rerun()
+
+        for c in paginated_colleges:
+            with st.expander(f"{c.get('name')} ({c.get('district')})"):
+                st.write(f"**Code:** {c.get('code')}")
+                st.write(f"**Placement:** {c.get('placement', 'N/A')}")
+                
+                # Show key branch cutoffs if available
+                # This assumes we can fetch cutoffs easily. Since data structure might be simple,
+                # we'll try to fetch if method exists or show generic info
+                # Show cutoffs for all years
+                try:
+                    cutoffs = st.session_state.agent.data_engine.get_college_cutoffs(str(c.get('code')))
+                    if cutoffs:
+                        # Process data for all years
+                        cutoff_data = {}
+                        years = sorted(list(set(x['year'] for x in cutoffs)), reverse=True)
+                        
+                        # Get all branches with full names
+                        # Map branch_code to branch_name from the data itself
+                        branch_map = {}
+                        for x in cutoffs:
+                            if x.get('branch_code') and x.get('branch_name'):
+                                branch_map[x['branch_code']] = x['branch_name']
+                        
+                        all_branch_codes = sorted(list(set(x['branch_code'] for x in cutoffs)))
+                        
+                        for b_code in all_branch_codes:
+                            b_name = branch_map.get(b_code, b_code)
+                            cutoff_data[b_name] = {}
+                            
+                            for year in years:
+                                match = next((x for x in cutoffs if x['year'] == year and x['branch_code'] == b_code), None)
+                                if match:
+                                    # Get Cutoff
+                                    val = match.get('cutoffs', {}).get('OC', '-')
+                                    
+                                    # specific logic for 2025 to show Rank
+                                    if year == 2025:
+                                        rank = match.get('ranks', {}).get('OC') if match.get('ranks') else None
+                                        if val != '-' and rank:
+                                            cutoff_data[b_name][f"{year} Cutoff (Rank)"] = f"{val} (#{rank})"
+                                        elif val != '-':
+                                            cutoff_data[b_name][f"{year} Cutoff (Rank)"] = f"{val}"
+                                        else:
+                                            cutoff_data[b_name][f"{year} Cutoff (Rank)"] = "-"
+                                    else:
+                                        cutoff_data[b_name][str(year)] = val
+                                else:
+                                    if year == 2025:
+                                        cutoff_data[b_name][f"{year} Cutoff (Rank)"] = "-"
+                                    else:
+                                        cutoff_data[b_name][str(year)] = "-"
+                        
+                        # Create DataFrame
+                        df_cutoffs = pd.DataFrame.from_dict(cutoff_data, orient='index')
+                        
+                        # Reorder columns to ensure 2025 is first, then descending
+                        cols = []
+                        if 2025 in years:
+                            cols.append("2025 Cutoff (Rank)")
+                        for y in years:
+                            if y != 2025:
+                                cols.append(str(y))
+                                
+                        # Filter cols that actually exist in df
+                        valid_cols = [c for c in cols if c in df_cutoffs.columns]
+                        df_cutoffs = df_cutoffs[valid_cols]
+                        
+                        st.write("**Cutoff Trends (OC) - Mark & (Rank):**")
+                        st.dataframe(df_cutoffs, use_container_width=True)
+                    else:
+                        st.info("No cutoff data available.")
+                except Exception as e:
+                    st.error(f"Error loading cutoffs: {e}")
+
+                if c.get('website'):
+                    st.markdown(f"[Visit Website]({c.get('website')})")
+    
+    with tab2:
+        col_map_1, col_map_2 = st.columns([3, 1])
+        with col_map_1:
+             st.write("### 🗺️ College Map")
+        with col_map_2:
+             my_loc = st.text_input("📍 My Location", placeholder="e.g. Salem", key="user_map_loc")
+        
+        user_coords = None
+        if my_loc:
+            # Use the agent's geo locator to resolve
+            user_coords = st.session_state.agent.geo_locator._resolve_location(my_loc)
+            if not user_coords:
+                st.toast("Location not found", icon="⚠️")
+
+        st.session_state.map_component.render_map(filtered_colleges, user_location=user_coords)
+
+elif st.session_state.current_view == "compare":
+    st.session_state.compare_component.render_comparison()
 
 # Footer
 st.markdown("---")

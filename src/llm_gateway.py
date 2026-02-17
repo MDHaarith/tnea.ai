@@ -1,5 +1,5 @@
 import logging
-from openai import OpenAI
+from openai import AsyncOpenAI
 import json
 import time
 from config import config
@@ -16,13 +16,13 @@ class LLMClient:
         if not self.api_key:
              raise ValueError("API Key is required. Set NVIDIA_API_KEY in .env or pass it explicitly.")
 
-        self.client = OpenAI(
+        self.client = AsyncOpenAI(
             base_url=self.base_url,
             api_key=self.api_key
         )
         logger.info(f"LLM client initialized: model={self.model_name}")
 
-    def generate_response(self, prompt: str, system_prompt: str = None, context: list = None, stream: bool = False):
+    async def generate_response(self, prompt: str, system_prompt: str = None, context: list = None, stream: bool = False):
         """Generates a response from the LLM using NVIDIA API."""
         messages = []
         if system_prompt:
@@ -35,7 +35,7 @@ class LLMClient:
 
         try:
             if stream:
-                response = self.client.chat.completions.create(
+                response = await self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
                     temperature=0.6,
@@ -43,9 +43,9 @@ class LLMClient:
                     max_tokens=2048,
                     stream=True
                 )
-                def streamer():
+                async def streamer():
                     full_response = ""
-                    for chunk in response:
+                    async for chunk in response:
                         if chunk.choices and chunk.choices[0].delta.content is not None:
                             token = chunk.choices[0].delta.content
                             full_response += token
@@ -53,7 +53,7 @@ class LLMClient:
                     yield "", []
                 return streamer()
             else:
-                completion = self.client.chat.completions.create(
+                completion = await self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
                     temperature=0.6,
@@ -67,15 +67,15 @@ class LLMClient:
             error_msg = f"Error communicating with NVIDIA API: {str(e)}"
             logger.error(error_msg)
             if stream:
-                def error_streamer():
+                async def error_streamer():
                     yield f"⚠️ AI Service Unavailable: {error_msg}", []
                 return error_streamer()
             return error_msg, []
 
-    def chat(self, messages: list) -> str:
+    async def chat(self, messages: list) -> str:
         """Chat with the LLM using the completions API."""
         try:
-            completion = self.client.chat.completions.create(
+            completion = await self.client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
                 temperature=0.6,

@@ -65,6 +65,23 @@ class DataEngine:
                 self.seats = json.load(f)
                 
             logger.info(f"Loaded {len(self.colleges)} colleges, {len(self.cutoffs)} cutoffs, {len(self.seats)} seats")
+            
+            # Merge precise geo-locations
+            if self.college_locations:
+                updated_count = 0
+                for college in self.colleges:
+                    code = str(college.get('code'))
+                    if code in self.college_locations:
+                        geo_data = self.college_locations[code].get('location', {})
+                        if geo_data.get('lat') and geo_data.get('lon'):
+                            try:
+                                college['lat'] = float(geo_data['lat'])
+                                college['lng'] = float(geo_data['lon'])
+                                updated_count += 1
+                            except (ValueError, TypeError):
+                                pass
+                logger.info(f"Updated geo-locations for {updated_count} colleges")
+                
         except Exception as e:
             logger.error(f"Error loading JSON data: {e}")
 

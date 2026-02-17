@@ -11,6 +11,8 @@ from logic.trend_analysis import TrendAnalysis
 
 from ai.reasoning_engine import ReasoningEngine
 from ai.response_formatter import ResponseFormatter
+from ai.embedding_search import CollegeEmbeddingSearch
+from ai.rag_engine import GuidelineRAG
 
 from agent.intent_router import IntentRouter
 from agent.session_memory import SessionMemory
@@ -34,6 +36,42 @@ def _safe_float(value, default=None):
 
 
 class CounsellorAgent:
+    STRATEGIC_ALIASES = {
+        "CEG": "COLLEGE OF ENGINEERING GUINDY",
+        "GUINDY": "COLLEGE OF ENGINEERING GUINDY",
+        "MIT": "MADRAS INSTITUTE OF TECHNOLOGY",
+        "MIT CHROMEPET": "MADRAS INSTITUTE OF TECHNOLOGY",
+        "SSN": "SSN COLLEGE OF ENGINEERING",
+        "KCT": "KUMARAGURU COLLEGE OF TECHNOLOGY",
+        "KUMARAGURU": "KUMARAGURU COLLEGE OF TECHNOLOGY",
+        "PSG": "PSG COLLEGE OF TECHNOLOGY", 
+        "PSG TECH": "PSG COLLEGE OF TECHNOLOGY",
+        "PSG ITECH": "PSG INSTITUTE OF TECHNOLOGY AND APPLIED RESEARCH",
+        "SKCET": "SRI KRISHNA COLLEGE OF ENGINEERING AND TECHNOLOGY",
+        "REC": "RAJALAKSHMI ENGINEERING COLLEGE",
+        "SVCE": "SRI VENKATESWARA COLLEGE OF ENGINEERING",
+        "CIT": "COIMBATORE INSTITUTE OF TECHNOLOGY", 
+        "GCT": "GOVERNMENT COLLEGE OF TECHNOLOGY",
+        "GCE": "GOVERNMENT COLLEGE OF ENGINEERING",
+        "SAIRAM": "SRI SAIRAM ENGINEERING COLLEGE",
+        "RMK": "R.M.K. ENGINEERING COLLEGE",
+        "RMD": "R.M.D. ENGINEERING COLLEGE",
+        "ST JOSEPH": "ST. JOSEPH'S COLLEGE OF ENGINEERING",
+        "JEPPIAAR": "JEPPIAAR ENGINEERING COLLEGE",
+        "LOYOLA": "LOYOLA-ICAM COLLEGE OF ENGINEERING AND TECHNOLOGY",
+        "LICET": "LOYOLA-ICAM COLLEGE OF ENGINEERING AND TECHNOLOGY",
+        "MEPCO": "MEPCO SCHLENK ENGINEERING COLLEGE",
+        "KONGU": "KONGU ENGINEERING COLLEGE",
+        "BANNARI": "BANNARI AMMAN INSTITUTE OF TECHNOLOGY",
+        "BIT": "BANNARI AMMAN INSTITUTE OF TECHNOLOGY",
+        "SONA": "SONA COLLEGE OF TECHNOLOGY",
+        "VELAMMAL": "VELAMMAL ENGINEERING COLLEGE",
+        "EASWARI": "EASWARI ENGINEERING COLLEGE",
+        "PANIMALAR": "PANIMALAR ENGINEERING COLLEGE",
+        "SAVITHA": "SAVEETHA ENGINEERING COLLEGE",
+        "SAVEETHA": "SAVEETHA ENGINEERING COLLEGE",
+    }
+
     def __init__(self, memory=None):
         # Data & Logic
         self.data_engine = DataEngine()
@@ -50,12 +88,16 @@ class CounsellorAgent:
         self.reasoning = ReasoningEngine()
         self.formatter = ResponseFormatter()
         self.llm = LLMClient()
+        self.embedding_search = CollegeEmbeddingSearch()
+        self.rag = GuidelineRAG()
+        if self.data_engine.colleges:
+             self.embedding_search.index_colleges(self.data_engine.colleges, self.STRATEGIC_ALIASES)
         
         # Agent
         self.intent_router = IntentRouter()
         self.memory = memory if memory is not None else SessionMemory()
         
-    def process_query_stream(self, user_query: str) -> Generator[str, None, None]:
+    async def process_query_stream(self, user_query: str) -> Generator[str, None, None]:
         """Main orchestration loop."""
         # 1. Update Memory
         self.memory.add_message("user", user_query)
@@ -85,14 +127,30 @@ class CounsellorAgent:
             mark = _safe_float(entities.get("mark"))
             if mark is not None and validate_mark(mark):
                 self.memory.update_profile("mark", mark)
-                p = self.predictor.predict_percentile(mark)
+                
+                # Get prediction with confidence interval
+                p_result = self.predictor.predict_percentile(mark)
+                
+                # Handle both dict (new) and float (legacy/fallback)
+                if isinstance(p_result, dict):
+                    p = p_result['prediction']
+                    p_low = p_result['lower']
+                    p_high = p_result['upper']
+                else:
+                    p = p_result
+                    p_low = p
+                    p_high = p
+                
                 r = self.predictor.predict_rank(p)
                 total = self.predictor.predict_total_students()
                 
                 self.memory.update_profile("percentile", p)
                 self.memory.update_profile("rank", r)
                 
+                # Prepare prompt with range info
                 final_prompt = self.reasoning.prepare_prediction_explanation_prompt(mark, p, r, total)
+                if isinstance(p_result, dict):
+                     final_prompt += f"\n\nAdditional Data: The predicted percentile confidence interval is {p_low}% to {p_high}%."
             else:
                 yield "Could you please specify a valid cutoff mark (0-200) so I can predict your percentile?"
                 return
@@ -118,6 +176,11 @@ class CounsellorAgent:
                     c for c in self.data_engine.colleges 
                     if college_name_upper in c.get('name', '').upper()
                 ]
+
+                # Semantic fallback if no string match
+                if not nearby_colleges:
+                     results = self.embedding_search.search(search_name, top_k=5, threshold=0.4)
+                     nearby_colleges = [r[0] for r in results]
                 
                 if not nearby_colleges and college_name:
                      # Try again with raw input if resolved name yielded nothing
@@ -230,7 +293,14 @@ class CounsellorAgent:
                 return
             
             user_mark_f = float(user_mark)
-            predicted_pct = self.predictor.predict_percentile(user_mark_f)
+            p_result = self.predictor.predict_percentile(user_mark_f)
+            
+            if isinstance(p_result, dict):
+                predicted_pct = p_result['prediction']
+                # Store range in memory if needed, or just use the mean for rank
+            else:
+                predicted_pct = p_result
+
             predicted_rank = self.predictor.predict_rank(predicted_pct)
             predicted_total = self.predictor.predict_total_students()
             
@@ -260,11 +330,18 @@ class CounsellorAgent:
             location = entities.get("location") or self.memory.user_profile.get("preferred_location")
             community = entities.get("community") or self.memory.user_profile.get("community", "OC")
             
-            predicted_pct = self.predictor.predict_percentile(user_mark_f)
+            p_result = self.predictor.predict_percentile(user_mark_f)
+            if isinstance(p_result, dict):
+                 predicted_pct = p_result['prediction']
+                 p_str = f"{p_result['prediction']} (Range: {p_result['lower']}-{p_result['upper']})"
+            else:
+                 predicted_pct = p_result
+                 p_str = str(predicted_pct)
+
             predicted_rank = self.predictor.predict_rank(predicted_pct)
             predicted_total = self.predictor.predict_total_students()
             
-            yield f"📊 **Your Profile**: Cutoff **{user_mark_f}** → Percentile **{predicted_pct}** → Rank **~{predicted_rank}** (out of ~{predicted_total})\n\n"
+            yield f"📊 **Your Profile**: Cutoff **{user_mark_f}** → Percentile **{p_str}** → Rank **~{predicted_rank}** (out of ~{predicted_total})\n\n"
             yield f"📋 **Generating your choice-filling priority table...**\n\n"
             
             if location:
@@ -353,14 +430,19 @@ Be comprehensive and detailed. This table will be used by the student for actual
                 final_prompt = f"User asked for trends: {user_query}\n\nHere is the trend overview:\n{rising}\n\nProvide insights on which branches are growing and which are declining. Advise the student based on this data."
             
         else:  # GENERAL_QUERY or GUIDANCE
-            guidelines = self.data_engine.get_guidelines()[:2000]
-            final_prompt = f"User Query: {user_query}\n\nContext (TNEA Guidelines): {guidelines}\n\nAnswer the user."
+            # Use RAG to get relevant context
+            context = self.rag.query(user_query, n_results=4)
+            if not context:
+                # Fallback to static dump if RAG returns nothing (unlikely unless empty DB)
+                context = self.data_engine.get_guidelines()[:2000]
+                
+            final_prompt = f"User Query: {user_query}\n\nRelevant TNEA Guidelines Context:\n{context}\n\nAnswer the user's question accurately using the context provided. If the context doesn't have the answer, use your general knowledge but mention that it might not be specific to TNEA 2024 rules."
 
         # 4. Stream LLM Response
         if final_prompt:
-            stream = self.llm.generate_response(final_prompt, system_prompt=system_prompt, stream=True)
+            stream = await self.llm.generate_response(final_prompt, system_prompt=system_prompt, stream=True)
             full_response = ""
-            for chunk, _ in stream:
+            async for chunk, _ in stream:
                  full_response += chunk
                  yield chunk
             
@@ -537,6 +619,9 @@ IMPORTANT: Always end your response with this exact question (on a new line):
             "CEG": "COLLEGE OF ENGINEERING GUINDY",
             "GUINDY": "COLLEGE OF ENGINEERING GUINDY",
             "MIT": "MADRAS INSTITUTE OF TECHNOLOGY",
+            "MIT CHROMEPET": "MADRAS INSTITUTE OF TECHNOLOGY",
+            "ANNA UNIVERSITY MAIN CAMPUS": "COLLEGE OF ENGINEERING GUINDY",
+            "ANNA UNIV MAIN": "COLLEGE OF ENGINEERING GUINDY",
             "SSN": "SSN COLLEGE OF ENGINEERING",
             "KCT": "KUMARAGURU COLLEGE OF TECHNOLOGY",
             "KUMARAGURU": "KUMARAGURU COLLEGE OF TECHNOLOGY",
@@ -571,6 +656,11 @@ IMPORTANT: Always end your response with this exact question (on a new line):
         upper_input = college_input.upper()
         if upper_input in ALIASES:
             return ALIASES[upper_input]
+
+        # 1.5 Semantic Search for Resolution
+        results = self.embedding_search.search(college_input, top_k=1, threshold=0.6)
+        if results:
+            return results[0][0].get('name')
             
         # 2. Fuzzy Match against known Aliases
         match = difflib.get_close_matches(upper_input, ALIASES.keys(), n=1, cutoff=0.8)
