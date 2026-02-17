@@ -388,17 +388,33 @@ if st.session_state.current_view == "chat":
 elif st.session_state.current_view == "analytics":
     st.header("📊 Analytics Dashboard")
     
-    # Load analytics data
+    # --- Section 1: Personal Performance ---
+    st.subheader("Your Performance")
     profile = st.session_state.agent.memory.user_profile
     
-    if profile.get('mark') and profile.get('percentile') and profile.get('rank'):
+    if profile.get('mark'):
+        # Ensure rank and percentile are calculated
+        if not profile.get('rank') or not profile.get('percentile'):
+            try:
+                cutoff = float(profile.get('mark'))
+                p_res = st.session_state.agent.predictor.predict_percentile(cutoff)
+                percentile = p_res['prediction'] if isinstance(p_res, dict) else p_res
+                rank = st.session_state.agent.predictor.predict_rank(percentile)
+                
+                # Update profile with calculated values
+                st.session_state.agent.memory.update_profile("percentile", percentile)
+                st.session_state.agent.memory.update_profile("rank", rank)
+                profile = st.session_state.agent.memory.user_profile # Refresh
+            except Exception as e:
+                pass
+        
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.markdown(f"""
             <div class="metric-card">
                 <h3>🏆 Estimated Rank</h3>
-                <h1 style="color: #ff9800;">~{profile.get('rank')}</h1>
+                <h1 style="color: #ff9800;">~{profile.get('rank', 'N/A')}</h1>
                 <p>Out of {st.session_state.agent.predictor.predict_total_students():,} Students</p>
             </div>
             """, unsafe_allow_html=True)
@@ -420,16 +436,21 @@ elif st.session_state.current_view == "analytics":
                 <p>Top {100 - profile.get('percentile'):.2f}% of Students</p>
             </div>
             """, unsafe_allow_html=True)
-        
-        # Visualization
+    else:
+        st.info("Enter your cutoff mark in the Profile section to see your personal stats.")
+
+    st.divider()
+    
+    # Visualization of Percentile (Restoring Gauge Chart for Student Analytics)
+    if profile.get('percentile'):
         st.subheader("Performance Visualization")
+        import plotly.graph_objects as go
         
-        # Create a simple chart
         fig = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=profile.get('percentile'),
             domain={'x': [0, 1], 'y': [0, 1]},
-            title={'text': "Percentile Performance"},
+            title={'text': "Your Percentile"},
             delta={'reference': 50},
             gauge={
                 'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
@@ -450,15 +471,14 @@ elif st.session_state.current_view == "analytics":
                 }
             }
         ))
-        
         fig.update_layout(height=300)
         st.plotly_chart(fig, use_container_width=True)
-        
-    else:
-        st.info("Enter your cutoff mark in the Profile section to see analytics.")
-        if st.button("Go to Profile"):
-            st.session_state.current_view = "profile"
-            st.rerun()
+
+    # --- Market Trends Removed per user request ---
+
+    # --- Section 3: College Distribution (REMOVED per user request) ---
+    # User requested only student-centric analytics.
+    pass
 
 elif st.session_state.current_view == "recommendations":
     st.header("📋 Personalized Recommendations")
@@ -811,7 +831,10 @@ elif st.session_state.current_view == "search":
         st.session_state.map_component.render_map(filtered_colleges, user_location=user_coords)
 
 elif st.session_state.current_view == "compare":
-    st.session_state.compare_component.render_comparison()
+    # Pass user profile for Match Score calculation
+    st.session_state.compare_component.render_comparison(
+        user_profile=st.session_state.agent.memory.user_profile
+    )
 
 # Footer
 st.markdown("---")

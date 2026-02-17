@@ -193,24 +193,69 @@ class DataEngine:
             logger.error(f"DB Error get_cutoffs_by_branch: {e}")
             return []
 
-    def get_total_seats_for_college(self, college_code: str, branch_code: str) -> int:
-        """Retrieves total seats for a college+branch from SQLite."""
+    def get_total_seats_for_college(self, college_code: str, branch_code: str = None) -> int:
+        """Retrieves total seats for a college (sum of all branches) or specific branch."""
         if not self.conn:
             return 0
             
         try:
             cursor = self.conn.cursor()
-            cursor.execute("SELECT total FROM seats WHERE college_code = ? AND branch_code = ?", (college_code, branch_code))
-            row = cursor.fetchone()
-            return row['total'] if row else 0
+            if branch_code:
+                cursor.execute("SELECT total FROM seats WHERE college_code = ? AND branch_code = ?", (college_code, branch_code))
+                row = cursor.fetchone()
+                return row['total'] if row else 0
+            else:
+                cursor.execute("SELECT SUM(total) as total_seats FROM seats WHERE college_code = ?", (college_code,))
+                row = cursor.fetchone()
+                return row['total_seats'] if row and row['total_seats'] else 0
         except Exception as e:
             logger.error(f"DB Error get_seats: {e}")
             return 0
 
-    
     def get_guidelines(self) -> str:
         """Returns the TNEA guidelines text."""
         return self.guidelines
+
+    def get_yearly_cutoff_stats(self, branch_code: str) -> Dict[int, Dict[str, float]]:
+        """
+        Returns stats (avg, max, min) for a branch per year.
+        Used for Trend Charts.
+        """
+        if not self.conn:
+            return {}
+        
+        try:
+            cursor = self.conn.cursor()
+            query = """
+                SELECT year, AVG(oc) as avg_cutoff, MAX(oc) as max_cutoff, MIN(oc) as min_cutoff
+                FROM cutoffs 
+                WHERE branch_code = ? AND oc IS NOT NULL
+                GROUP BY year
+                ORDER BY year
+            """
+            cursor.execute(query, (branch_code,))
+            rows = cursor.fetchall()
+            
+            stats = {}
+            for r in rows:
+                stats[r['year']] = {
+                    'avg': round(r['avg_cutoff'], 2),
+                    'max': r['max_cutoff'],
+                    'min': r['min_cutoff']
+                }
+            return stats
+        except Exception as e:
+            logger.error(f"Error getting yearly stats for {branch_code}: {e}")
+            return {}
+
+    def get_district_stats(self) -> Dict[str, int]:
+        """Returns college count per district."""
+        stats = {}
+        for c in self.colleges:
+            d = c.get('district', 'Unknown')
+            stats[d] = stats.get(d, 0) + 1
+        # Sort by count desc
+        return dict(sorted(stats.items(), key=lambda item: item[1], reverse=True))
 
 if __name__ == "__main__":
     engine = DataEngine()

@@ -68,11 +68,16 @@ class MapComponent:
 
             if lat and lon:
                 try:
-                    folium.Marker(
-                        [float(lat), float(lon)],
+                    # Use CircleMarker for better performance on mobile/large datasets
+                    folium.CircleMarker(
+                        location=[float(lat), float(lon)],
+                        radius=8,
                         popup=folium.Popup(popup_html, max_width=250),
                         tooltip=f"{name} ({district})",
-                        icon=folium.Icon(color=color, icon="info-sign")
+                        color=color,
+                        fill=True,
+                        fill_color=color,
+                        fill_opacity=0.7
                     ).add_to(marker_cluster)
                     
                     # Draw visual line if user location exists and few colleges
