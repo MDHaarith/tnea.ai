@@ -1,5 +1,6 @@
 import math
 import logging
+import difflib
 from typing import List, Dict, Optional
 from data.college_store import CollegeStore
 from data.loader import DataEngine
@@ -56,6 +57,12 @@ class GeoLocator:
         for district, center in self._district_centers.items():
             if loc_upper in district or district in loc_upper:
                 return center
+                
+        # Fuzzy match using difflib for typos (e.g. "aryalur" -> "ARIYALUR")
+        matches = difflib.get_close_matches(loc_upper, self._district_centers.keys(), n=1, cutoff=0.7)
+        if matches:
+            logger.info(f"Fuzzy matched location '{location}' to '{matches[0]}'")
+            return self._district_centers[matches[0]]
         
         # Try matching a college name and using its coordinates
         for college in self.data_engine.colleges:

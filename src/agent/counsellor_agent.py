@@ -1,5 +1,6 @@
 import json
 import logging
+import difflib
 from typing import Generator
 
 from data.loader import DataEngine
@@ -97,7 +98,89 @@ class CounsellorAgent:
                 return
 
         elif intent == "SUGGEST_COLLEGES":
+            # Check if user is asking about a specific college (Info Query) vs General Recommendation
+            college_name_input = entities.get("college_name")
+            
+            # Resolve college name if provided
+            college_name = None
+            if college_name_input:
+                college_name = self._resolve_college_name(college_name_input)
+            
             user_mark = _safe_float(entities.get("mark")) or _safe_float(self.memory.user_profile.get("mark"))
+            
+            # If specific college request but no mark, JUST return college info (don't block)
+            if college_name_input and (user_mark is None or not validate_mark(user_mark)):
+                # If resolution failed, try using input directly or notify user
+                search_name = college_name or college_name_input
+                college_name_upper = search_name.upper()
+                
+                nearby_colleges = [
+                    c for c in self.data_engine.colleges 
+                    if college_name_upper in c.get('name', '').upper()
+                ]
+                
+                if not nearby_colleges and college_name:
+                     # Try again with raw input if resolved name yielded nothing
+                     nearby_colleges = [
+                        c for c in self.data_engine.colleges 
+                        if college_name_input.upper() in c.get('name', '').upper()
+                    ]
+
+                if not nearby_colleges:
+                     yield f"I couldn't find a college matching '{college_name_input}' (Resolved: {college_name or 'N/A'}). Could you check the spelling?"
+                     return
+                
+                # Show details for found colleges
+                yield f"**Found {len(nearby_colleges)} college(s) matching '{college_name_input}':**\n\n"
+                for c in nearby_colleges[:3]: # Limit to top 3 matches
+                    yield f"**{c.get('name')}**\n"
+                    yield f"- 📍 Location: {c.get('district')}\n"
+                    if c.get('placement') and c.get('placement') not in ['N/A', 'No Data']:
+                         yield f"- 💼 Placement: {c.get('placement')}\n"
+                    
+                    # Show cutoffs if available (using 2024 data as generic ref)
+                    code = str(c.get('code'))
+                    cutoffs = self.data_engine.get_college_cutoffs(code)
+                    if cutoffs:
+                        yield "- 📉 **Past Cutoffs (OC)**: "
+                        # Get latest year cutoffs for a few branches
+                        latest_year = max([x.get('year',0) for x in cutoffs]) if cutoffs else 0
+                        relevant = [x for x in cutoffs if x.get('year') == latest_year][:3]
+                        cutoff_strs = [f"{x.get('branch_code')}: {x.get('cutoffs',{}).get('OC','N/A')}" for x in relevant]
+                        yield ", ".join(cutoff_strs) + " ...\n"
+                    yield "\n"
+                
+                yield "\n*To get your specific admission probability, please tell me your cutoff mark.*"
+                return
+
+            # If Location-based query but no mark, JUST return colleges in that location (don't block)
+            location_input = entities.get("location")
+            if location_input and (user_mark is None or not validate_mark(user_mark)):
+                 nearby = self.geo_locator.find_nearby_colleges(location_input)
+                 if not nearby:
+                     # Fallback to string match if geo fails
+                     nearby = [c for c in self.data_engine.colleges if location_input.upper() in c.get('district','').upper()]
+
+                 if not nearby:
+                     yield f"I couldn't find any engineering colleges in or near '{location_input}'."
+                     return
+                 
+                 yield f"**Found {len(nearby)} colleges near '{location_input}':**\n\n"
+                 # Show top 5
+                 for c in nearby[:5]:
+                    dist_str = f" (~{c.get('_distance_km')} km away)" if c.get('_distance_km') else ""
+                    yield f"**{c.get('name')}**{dist_str}\n"
+                    yield f"- 📍 {c.get('district', 'Unknown')}\n"
+                    if c.get('placement') and c.get('placement') not in ['N/A', 'No Data']:
+                         yield f"- 💼 Placement: {c.get('placement')}\n"
+                    yield "\n"
+                 
+                 if len(nearby) > 5:
+                     yield f"*...and {len(nearby)-5} more.*\n"
+
+                 yield "\n*To see which of these you can likely get into, please tell me your cutoff mark.*"
+                 return
+
             if user_mark is None or not validate_mark(user_mark):
                 yield "I need to know your cutoff marks (0-200) to suggest colleges. What is your score?"
                 return
@@ -115,7 +198,6 @@ class CounsellorAgent:
             if entities.get("community"):
                 self.memory.update_profile("community", entities["community"])
             
-            college_name = entities.get("college_name")
             
             if location:
                 nearby_colleges = self.geo_locator.find_nearby_colleges(location)
@@ -125,14 +207,16 @@ class CounsellorAgent:
                 nearby_colleges = self.data_engine.colleges
             
             if college_name:
+                # Use the resolved name
                 college_name_upper = college_name.upper()
                 nearby_colleges = [
                     c for c in nearby_colleges 
                     if college_name_upper in c.get('name', '').upper()
                 ]
+                # Fallback to broad search if strict filter failed
                 if not nearby_colleges:
-                    nearby_colleges = [
-                        c for c in self.data_engine.colleges
+                     nearby_colleges = [
+                        c for c in self.data_engine.colleges 
                         if college_name_upper in c.get('name', '').upper()
                     ]
             
@@ -153,7 +237,7 @@ class CounsellorAgent:
             self.memory.update_profile("percentile", predicted_pct)
             self.memory.update_profile("rank", predicted_rank)
             
-            yield f"📊 **Your Profile**: Cutoff **{user_mark_f}** → Predicted Percentile **{predicted_pct}** → Estimated Rank **~{predicted_rank}** (out of ~{predicted_total} students)\n\n"
+            # Removed repetitive "Your Profile" template. This info is now in context.
             
             categorized = self.choice_strategy.categorize_options(user_mark_f, enriched)
             
@@ -283,8 +367,8 @@ Be comprehensive and detailed. This table will be used by the student for actual
             # 5. Save Agent Response to memory
             self.memory.add_message("assistant", full_response)
             
-            # 6. Disclaimer
-            yield "\n\n---\n⚠️ **Note**: Cutoff data is from official TNEA records. Placement stats and predictions are AI estimates. Please verify details with colleges directly.\n---\n"
+            # 6. Disclaimer (Reduced)
+            yield "\n\n<span style='font-size:0.8em; color:gray'>Note: Cutoff data from official TNEA records. Predictions are AI estimates. Verify with colleges.</span>"
 
     # Branch alias mapping
     BRANCH_ALIASES = {
@@ -403,7 +487,7 @@ Be comprehensive and detailed. This table will be used by the student for actual
         
         location_str = f" in {location}" if location else " across Tamil Nadu"
         branch_str = f" for {branch} branch" if branch else ""
-        rank_str = f"\nPredicted Rank: ~{rank} (Percentile: {percentile}, out of ~{total_students} students)" if rank else ""
+        rank_str = f"\nStudent Rank: ~{rank} (Percentile: {percentile}, Total Students: ~{total_students})" if rank else ""
         
         return f"""The student asked: "{user_query}"
 Student's Cutoff Mark: {mark}{rank_str}
@@ -421,12 +505,13 @@ Below is the REAL data from our TNEA database. You MUST ONLY reference colleges 
 {ambitious_data}
 
 INSTRUCTIONS:
-1. Start with a 1-line rank summary (e.g., "With rank ~{rank or 'N/A'}, you're in the top X% of TNEA applicants").
+1. **Focus on RANK** for context: Start by mentioning their estimated rank (~{rank}) to set expectations. Mention cutoff only as a reference.
 2. Present the top 10 best college options from ALL categories above. Prioritize Moderate and Safe choices with the highest cutoffs (most competitive colleges the student can realistically get).
 3. For EACH college, mention: college name, ALL eligible branches with cutoffs, placement % from the data (if available), and label it ✅ Safe / ⚖️ Moderate / 🚀 Ambitious.
 4. NEVER invent any data. Use EXACT numbers from above.
 5. For placement: ONLY quote the placement % shown in the data above. If placement says "No Data", say "Placement: Not verified" — DO NOT make up percentages or salary figures.
 6. Keep descriptions to 1-2 lines per college.
+7. Avoid repetitive headers like "Based on your cutoff...". Be conversational.
 
 NEXT STEPS (Always include these at the end):
 After presenting colleges, suggest 3-4 specific, actionable next steps such as:
@@ -439,3 +524,75 @@ After presenting colleges, suggest 3-4 specific, actionable next steps such as:
 IMPORTANT: Always end your response with this exact question (on a new line):
 "📋 **Would you like me to generate a complete choice-filling priority table with all eligible colleges ranked in recommended order?**"
 """
+
+    def _resolve_college_name(self, college_input: str) -> str:
+        """Resolves abbreviations or fuzzy names to full college names."""
+        if not college_input:
+            return None
+            
+        college_input = college_input.strip()
+        
+        # 1. Aliases Map
+        ALIASES = {
+            "CEG": "COLLEGE OF ENGINEERING GUINDY",
+            "GUINDY": "COLLEGE OF ENGINEERING GUINDY",
+            "MIT": "MADRAS INSTITUTE OF TECHNOLOGY",
+            "SSN": "SSN COLLEGE OF ENGINEERING",
+            "KCT": "KUMARAGURU COLLEGE OF TECHNOLOGY",
+            "KUMARAGURU": "KUMARAGURU COLLEGE OF TECHNOLOGY",
+            "PSG": "PSG COLLEGE OF TECHNOLOGY", # Careful, there's also PSG iTech
+            "PSG TECH": "PSG COLLEGE OF TECHNOLOGY",
+            "PSG ITECH": "PSG INSTITUTE OF TECHNOLOGY AND APPLIED RESEARCH",
+            "SKCET": "SRI KRISHNA COLLEGE OF ENGINEERING AND TECHNOLOGY",
+            "REC": "RAJALAKSHMI ENGINEERING COLLEGE",
+            "SVCE": "SRI VENKATESWARA COLLEGE OF ENGINEERING",
+            "CIT": "COIMBATORE INSTITUTE OF TECHNOLOGY", # Could specify Chennai/Coimbatore? usually CBE
+            "GCT": "GOVERNMENT COLLEGE OF TECHNOLOGY",
+            "GCE": "GOVERNMENT COLLEGE OF ENGINEERING",
+            "SAIRAM": "SRI SAIRAM ENGINEERING COLLEGE",
+            "RMK": "R.M.K. ENGINEERING COLLEGE",
+            "RMD": "R.M.D. ENGINEERING COLLEGE",
+            "ST JOSEPH": "ST. JOSEPH'S COLLEGE OF ENGINEERING",
+            "JEPPIAAR": "JEPPIAAR ENGINEERING COLLEGE",
+            "LOYOLA": "LOYOLA-ICAM COLLEGE OF ENGINEERING AND TECHNOLOGY",
+            "LICET": "LOYOLA-ICAM COLLEGE OF ENGINEERING AND TECHNOLOGY",
+            "MEPCO": "MEPCO SCHLENK ENGINEERING COLLEGE",
+            "KONGU": "KONGU ENGINEERING COLLEGE",
+            "BANNARI": "BANNARI AMMAN INSTITUTE OF TECHNOLOGY",
+            "BIT": "BANNARI AMMAN INSTITUTE OF TECHNOLOGY",
+            "SONA": "SONA COLLEGE OF TECHNOLOGY",
+            "VELAMMAL": "VELAMMAL ENGINEERING COLLEGE",
+            "EASWARI": "EASWARI ENGINEERING COLLEGE",
+            "PANIMALAR": "PANIMALAR ENGINEERING COLLEGE",
+            "SAVITHA": "SAVEETHA ENGINEERING COLLEGE",
+            "SAVEETHA": "SAVEETHA ENGINEERING COLLEGE",
+        }
+        
+        upper_input = college_input.upper()
+        if upper_input in ALIASES:
+            return ALIASES[upper_input]
+            
+        # 2. Fuzzy Match against known Aliases
+        match = difflib.get_close_matches(upper_input, ALIASES.keys(), n=1, cutoff=0.8)
+        if match:
+            return ALIASES[match[0]]
+            
+        # 3. Fuzzy match against all known college names in DB
+        all_names = [c.get('name', '').upper() for c in self.data_engine.colleges]
+        match = difflib.get_close_matches(upper_input, all_names, n=1, cutoff=0.7)
+        if match:
+            return match[0]
+
+        # 4. LLM Fallback (Simulation of "Web Search" / Reasoning)
+        try:
+            prompt = f"""Identify the specific Tamil Nadu engineering college referred to by: "{college_input}".
+            Return ONLY the full official name of the college. If unsure or if it's not a college, return "UNKNOWN"."""
+            
+            response, _ = self.llm.generate_response(prompt, max_tokens=50)
+            cleaned = response.strip().replace('"', '').replace('.', '')
+            if "UNKNOWN" not in cleaned and len(cleaned) > 5:
+                 return cleaned
+        except Exception:
+            pass
+            
+        return college_input

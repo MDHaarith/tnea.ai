@@ -58,24 +58,7 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         border-left: 5px solid #0992C2;
     }
-    .college-card {
-        background: #f8f9fa;
-        color: #333333;
-        padding: 15px;
-        border-radius: 30px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border: 1px solid #e0e0e0;
-        margin-bottom: 10px;
-    }
-    .safe-college {
-        border-left: 5px solid #4caf50 !important;
-    }
-    .moderate-college {
-        border-left: 5px solid #ff9800 !important;
-    }
-    .ambitious-college {
-        border-left: 5px solid #f44336 !important;
-    }
+
     .header {
         text-align: center;
         background: linear-gradient(135deg, #0B2D72 0%, #0992C2 100%);
@@ -109,7 +92,7 @@ st.markdown("""
             margin-bottom: 10px;
         }
     }
-    /* Chat Input Styling */
+    /* Chat Input Styling - REVERTED */
     .stChatInput {
         border: 2px solid #0AC4E0 !important;
         border-radius: 30px !important;
@@ -117,10 +100,29 @@ st.markdown("""
         transition: all 0.3s ease;
         background-color: transparent !important;
     }
+    
+    /* Circular Send Button - KEPT */
+    .stChatInput button {
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        padding: 5px !important;
+        background: linear-gradient(135deg, #0992C2 0%, #0AC4E0 100%) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+        transition: all 0.2s ease;
+    }
+    .stChatInput button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+    }
+    
     .stChatInput > div {
         border-radius: 30px !important;
         padding: 5px !important;
     }
+    
     .stChatInput:focus-within {
         border-radius: 30px !important;
         box-shadow: 0 0 15px rgba(10, 196, 224, 0.3) !important;
@@ -247,7 +249,7 @@ with st.sidebar:
     
     
     st.markdown("---")
-
+    
     
     # Save/Load Info
     st.subheader("💾 Session")
@@ -373,7 +375,7 @@ elif st.session_state.current_view == "analytics":
             <div class="metric-card">
                 <h3>🏆 Estimated Rank</h3>
                 <h1 style="color: #ff9800;">~{profile.get('rank')}</h1>
-                <p>Out of {st.session_state.agent.predictor.total_students:,} Students</p>
+                <p>Out of {st.session_state.agent.predictor.predict_total_students():,} Students</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -476,89 +478,91 @@ elif st.session_state.current_view == "recommendations":
                     
                     # Display categorized recommendations
                     # Display categorized recommendations
+                    # Consolidate recommendations for Table View
+                    all_recommendations = []
+                    
+                    # Helper to process a category
+                    def process_category(category_name, colleges, chance_label):
+                        for college in colleges:
+                            cutoff_val = float(college.get('cutoff_mark', 0))
+                            est_percentile = st.session_state.agent.predictor.predict_percentile(cutoff_val)
+                            est_rank = st.session_state.agent.predictor.predict_rank(est_percentile)
+                            
+                            diff = abs(user_mark - cutoff_val)
+                            match_score = max(0, int(100 - (diff * 2)))
+                            if match_score > 98: match_score = 99
+                            
+                            all_recommendations.append({
+                                "College Name": college.get('name', 'N/A'),
+                                "Branch": college.get('branch_name', 'N/A'),
+                                "Chance": chance_label,
+                                "Match %": match_score,
+                                "Cutoff": cutoff_val,
+                                "Est. Rank": est_rank,
+                                "District": college.get('district', 'N/A'),
+                                "Placement %": float(college.get('placement', 0)) if college.get('placement') and str(college.get('placement')).replace('.', '', 1).isdigit() else 0,
+                                "Code": college.get('code', 'N/A')
+                            })
+
                     if categorized.get('Safe'):
-                        st.subheader("✅ Safe Choices (High Probability)")
-                        for college in categorized['Safe'][:7]:  # Top 7
-                            # Calculate estimated rank and match score
-                            cutoff_val = float(college.get('cutoff_mark', 0))
-                            est_percentile = st.session_state.agent.predictor.predict_percentile(cutoff_val)
-                            est_rank = st.session_state.agent.predictor.predict_rank(est_percentile)
-                            
-                            # Match Score Logic
-                            diff = abs(user_mark - cutoff_val)
-                            match_score = max(0, int(100 - (diff * 2)))
-                            if match_score > 98: match_score = 99 # Cap slightly below 100 to be realistic
-                            
-                            with st.container():
-                                st.markdown(f"""
-                                <div class="college-card safe-college">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <strong>{college.get('name', 'N/A')}</strong>
-                                        <span style="background-color: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; border: 1px solid #c8e6c9;">Match: {match_score}%</span>
-                                    </div>
-                                    <span style="color: #555;">Est. Rank: <strong>~{est_rank}</strong></span><br>
-                                    Branch: {college.get('branch_name', 'N/A')}<br>
-                                    Cutoff: {college.get('cutoff_mark', 'N/A')}<br>
-                                    District: {college.get('district', 'N/A')}<br>
-                                    Placement: {college.get('placement', 'N/A')}
-                                </div>
-                                """, unsafe_allow_html=True)
-                    
+                        process_category('Safe', categorized['Safe'], "High (Safe)")
                     if categorized.get('Moderate'):
-                        st.subheader("⚖️ Moderate Choices (Good Probability)")
-                        for college in categorized['Moderate'][:7]:  # Top 7
-                            # Calculate estimated rank and match score
-                            cutoff_val = float(college.get('cutoff_mark', 0))
-                            est_percentile = st.session_state.agent.predictor.predict_percentile(cutoff_val)
-                            est_rank = st.session_state.agent.predictor.predict_rank(est_percentile)
-
-                            # Match Score Logic
-                            diff = abs(user_mark - cutoff_val)
-                            match_score = max(0, int(100 - (diff * 2)))
-                            
-                            with st.container():
-                                st.markdown(f"""
-                                <div class="college-card moderate-college">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <strong>{college.get('name', 'N/A')}</strong>
-                                        <span style="background-color: #fff3e0; color: #ef6c00; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; border: 1px solid #ffe0b2;">Match: {match_score}%</span>
-                                    </div>
-                                    <span style="color: #555;">Est. Rank: <strong>~{est_rank}</strong></span><br>
-                                    Branch: {college.get('branch_name', 'N/A')}<br>
-                                    Cutoff: {college.get('cutoff_mark', 'N/A')}<br>
-                                    District: {college.get('district', 'N/A')}<br>
-                                    Placement: {college.get('placement', 'N/A')}
-                                </div>
-                                """, unsafe_allow_html=True)
-                    
+                        process_category('Moderate', categorized['Moderate'], "Medium (Moderate)")
                     if categorized.get('Ambitious'):
-                        st.subheader("🚀 Ambitious Choices (Reach Goals)")
-                        for college in categorized['Ambitious'][:6]:  # Top 6
-                            # Calculate estimated rank and match score
-                            cutoff_val = float(college.get('cutoff_mark', 0))
-                            est_percentile = st.session_state.agent.predictor.predict_percentile(cutoff_val)
-                            est_rank = st.session_state.agent.predictor.predict_rank(est_percentile)
+                        process_category('Ambitious', categorized['Ambitious'], "Low (Ambitious)")
 
-                            # Match Score Logic
-                            diff = abs(user_mark - cutoff_val)
-                            match_score = max(0, int(100 - (diff * 2)))
+                    if all_recommendations:
+                        # Create DataFrame
+                        df = pd.DataFrame(all_recommendations)
+                        
+                        # Display Statistics
+                        st.markdown(f"### Found {len(df)} Colleges matching your criteria")
+                        
+                        # Configure Columns
+                        with st.expander("📊 View Detailed College Recommendations Table", expanded=False):
+                            st.dataframe(
+                                df,
+                                column_config={
+                                    "College Name": st.column_config.TextColumn("College", width="large"),
+                                    "Branch": st.column_config.TextColumn("Branch", width="medium"),
+                                    "Chance": st.column_config.Column(
+                                        "Approval Chance",
+                                        help="Estimated probability of admission",
+                                        width="small",
+                                    ),
+                                    "Match %": st.column_config.ProgressColumn(
+                                        "Match Score",
+                                        help="Relevance matching your profile",
+                                        format="%d%%",
+                                        min_value=0,
+                                        max_value=100,
+                                    ),
+                                    "Cutoff": st.column_config.NumberColumn(
+                                        "Cutoff",
+                                        format="%.2f",
+                                    ),
+                                    "Placement %": st.column_config.ProgressColumn(
+                                        "Placement History",
+                                        format="%d%%",
+                                        min_value=0,
+                                        max_value=100,
+                                    ),
+                                },
+                                use_container_width=True,
+                                hide_index=True,
+                            )
+                        
+                        # Export Option (Explicit button if dataframe export isn't enough)
+                        csv = df.to_csv(index=False).encode('utf-8')
+                        st.download_button(
+                            label="📥 Download Recommendations as CSV",
+                            data=csv,
+                            file_name=f'tnea_recommendations_{profile.get("mark")}.csv',
+                            mime='text/csv',
+                        )
 
-                            with st.container():
-                                st.markdown(f"""
-                                <div class="college-card ambitious-college">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <strong>{college.get('name', 'N/A')}</strong>
-                                        <span style="background-color: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; border: 1px solid #ffcdd2;">Match: {match_score}%</span>
-                                    </div>
-                                    <span style="color: #555;">Est. Rank: <strong>~{est_rank}</strong></span><br>
-                                    Branch: {college.get('branch_name', 'N/A')}<br>
-                                    Cutoff: {college.get('cutoff_mark', 'N/A')}<br>
-                                    District: {college.get('district', 'N/A')}<br>
-                                    Placement: {college.get('placement', 'N/A')}
-                                </div>
-                                """, unsafe_allow_html=True)
-                else:
-                    st.warning("No colleges found matching your criteria. Try adjusting your preferences.")
+                    else:
+                        st.warning("No colleges found matching your criteria. Try adjusting your preferences.")
             except Exception as e:
                 st.error(f"Error generating recommendations: {e}")
 
